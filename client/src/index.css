@@ -119,3 +119,39 @@ html,body,.archive-page { background:var(--paper); }.archive-page { background:r
 /* Design: 기록 탭은 학년별 성장 맥락을 고르게 선택하고, 핵심역량은 행동 근거로 읽히도록 차분한 기록 카드에 배치한다. */
 .grade-record-picker { margin-top:23px; padding:17px; border:1px solid #d5e5df; border-radius:12px; background:linear-gradient(135deg,#eef9f3,#fdfcf5); }.grade-record-picker-heading { display:flex; align-items:start; justify-content:space-between; gap:14px; }.grade-record-picker-heading>div { display:grid; gap:5px; }.grade-record-picker-heading span { color:#5c9083; font-size:12px; font-weight:850; letter-spacing:.04em; }.grade-record-picker-heading b { color:#527276; font-size:13px; }.grade-record-type { flex:0 0 auto; border-radius:99px; background:#fff0e9; padding:5px 8px; color:#c97561 !important; font-size:10px !important; letter-spacing:0 !important; }.grade-record-tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:14px; }.grade-record-tabs button { border:1px solid #cfe3d9; border-radius:9px; background:white; padding:10px 7px; color:#668682; font-size:13px; font-weight:800; transition:transform 160ms var(--ease-out),background 160ms var(--ease-out),color 160ms var(--ease-out); }.grade-record-tabs button:hover,.grade-record-tabs button.active { border-color:#7aac9e; background:#7aac9e; color:white; }.grade-record-tabs button:active { transform:scale(.97); }.grade-record-example { margin-top:12px; border-left-color:#7aac9e; background:#fffefb; box-shadow:none; }.record-competencies { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin:12px 0 0 !important; padding:8px 10px; border-radius:7px; background:#eff8f3; color:#66817d !important; font-family:inherit !important; font-size:12px !important; font-weight:650 !important; line-height:1.45 !important; letter-spacing:0 !important; }.record-competencies b { color:#5b8e80; font-size:11px; }.record-competencies span { color:#728984; }
 @media (max-width:760px) { .grade-record-picker { margin-top:18px; padding:14px; }.grade-record-picker-heading { gap:10px; }.grade-record-picker-heading b { font-size:12px; line-height:1.45; }.grade-record-type { padding:4px 7px; font-size:9px !important; }.grade-record-tabs { gap:6px; margin-top:12px; }.grade-record-tabs button { border-radius:8px; padding:9px 5px; font-size:12px; }.record-competencies { align-items:flex-start; flex-direction:column; gap:3px; font-size:11px !important; } }
+
+/* Design: 연구학교 설문을 프로그램 탐색 전에 안내하는 밝은 게시판형 카드. 버튼과 QR 코드는 같은 설문으로 연결해 접근 방식을 나란히 제공한다. */
+.survey-board-section { padding-top:54px; padding-bottom:30px; }
+.survey-board-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; border-top:2px solid #d5e7e1; padding-top:22px; }
+.survey-board-heading h2 { margin:5px 0 8px; color:#466f71; font-size:clamp(32px,3.2vw,43px); font-weight:850; letter-spacing:-.055em; line-height:1.15; }
+.survey-board-heading>div>p:not(.kicker) { margin:0; color:#708987; font-size:16px; line-height:1.65; }
+.survey-board-heading>span { flex:0 0 auto; border-radius:999px; background:#fff0e9; padding:8px 11px; color:#c97664; font-size:12px; font-weight:850; }
+.survey-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; margin-top:23px; }
+.survey-card { display:grid; grid-template-columns:minmax(0,1fr) 144px; align-items:center; gap:18px; overflow:hidden; min-height:225px; border:1px solid #d8e6e0; border-radius:22px; background:#fffefa; padding:20px; box-shadow:0 5px 0 #dce9e3,0 12px 22px rgba(78,113,104,.08); transition:transform 180ms var(--ease-out),box-shadow 180ms var(--ease-out); }
+.survey-card:hover { box-shadow:0 7px 0 #d0e4dc,0 16px 28px rgba(78,113,104,.13); transform:translateY(-3px); }
+.survey-card--peach { border-color:#f0d8cf; background:linear-gradient(135deg,#fffaf6,#fffefd 60%,#fff3ec); }
+.survey-card--mint { border-color:#cfe7dc; background:linear-gradient(135deg,#f5fcf8,#fffefd 60%,#edf9f3); }
+.survey-card-meta { display:flex; align-items:center; gap:8px; }
+.survey-card-meta span { display:grid; place-items:center; width:28px; height:28px; border-radius:9px; background:#e89d89; color:white; font-size:12px; font-weight:900; }
+.survey-card--mint .survey-card-meta span { background:#80b5a2; }
+.survey-card-meta b { color:#d27f69; font-size:12px; font-weight:850; letter-spacing:.04em; }
+.survey-card--mint .survey-card-meta b { color:#5f9985; }
+.survey-card h3 { margin:14px 0 9px; color:#486d70; font-size:23px; font-weight:850; letter-spacing:-.045em; line-height:1.25; word-break:keep-all; }
+.survey-card-body>p { margin:0; color:#6f8582; font-size:14px; line-height:1.65; word-break:keep-all; }
+.survey-open-button { display:inline-flex; align-items:center; gap:7px; margin-top:16px; border-radius:10px; background:#d9846e; padding:10px 12px; color:white; font-size:14px; font-weight:850; text-decoration:none; transition:transform 160ms var(--ease-out),background 160ms var(--ease-out); }
+.survey-card--mint .survey-open-button { background:#629b87; }
+.survey-open-button:hover { background:#bd6f5c; color:white; transform:translateY(-1px); }
+.survey-card--mint .survey-open-button:hover { background:#4e836f; }
+.survey-open-button:active { transform:scale(.97); }
+.survey-link-text { display:flex; align-items:center; gap:4px; width:max-content; max-width:100%; margin-top:9px; color:#b77f70; font-size:11px; font-weight:750; text-decoration:none; }
+.survey-card--mint .survey-link-text { color:#619381; }
+.survey-link-text:hover { text-decoration:underline; }
+.survey-qr-link { display:grid; justify-items:center; gap:7px; border:1px solid #efd8cf; border-radius:15px; background:rgba(255,255,255,.86); padding:8px; color:#b87564; font-size:11px; font-weight:850; line-height:1; text-decoration:none; transition:transform 160ms var(--ease-out),background 160ms var(--ease-out); }
+.survey-card--mint .survey-qr-link { border-color:#cce4d9; color:#5d907d; }
+.survey-qr-link:hover { background:white; transform:scale(1.025); }
+.survey-qr-link:active { transform:scale(.97); }
+.survey-qr-link img { display:block; width:112px; aspect-ratio:1; border-radius:7px; object-fit:contain; image-rendering:auto; }
+.survey-qr-link span { display:flex; align-items:center; gap:3px; }
+@media (max-width:860px) { .survey-card { grid-template-columns:minmax(0,1fr) 126px; } .survey-qr-link img { width:96px; } }
+@media (max-width:760px) { .simple-header nav { gap:9px; } .simple-header nav a { font-size:12px; } .survey-board-section { padding-top:38px; padding-bottom:19px; } .survey-board-heading { align-items:flex-start; gap:12px; padding-top:19px; } .survey-board-heading h2 { margin-top:4px; font-size:33px; } .survey-board-heading>div>p:not(.kicker) { font-size:14px; line-height:1.6; } .survey-board-heading>span { margin-top:9px; padding:6px 8px; font-size:10px; white-space:nowrap; } .survey-grid { grid-template-columns:1fr; gap:14px; margin-top:19px; } .survey-card { grid-template-columns:minmax(0,1fr) 112px; min-height:0; gap:11px; border-radius:18px; padding:16px; box-shadow:0 4px 0 #dce9e3,0 9px 16px rgba(78,113,104,.08); } .survey-card h3 { margin:11px 0 7px; font-size:20px; } .survey-card-body>p { font-size:13px; line-height:1.55; } .survey-open-button { margin-top:13px; padding:9px 10px; font-size:13px; } .survey-link-text { margin-top:8px; font-size:10px; } .survey-qr-link { gap:6px; border-radius:12px; padding:6px; font-size:10px; } .survey-qr-link img { width:86px; border-radius:5px; } }
+@media (prefers-reduced-motion:reduce) { .survey-card,.survey-open-button,.survey-qr-link { transition:none; } }
