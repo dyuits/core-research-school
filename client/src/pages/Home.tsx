@@ -3,7 +3,7 @@
  * 시각 장식을 절제하고 수업 정보·생활기록부 작성 근거의 가독성을 최우선으로 둔다.
  */
 import { useMemo, useState } from "react";
-import { Check, ChevronRight, ClipboardCheck, Copy, Eye, MessageCircleQuestion, Target, X } from "lucide-react";
+import { Check, ChevronRight, ClipboardCheck, Copy, ExternalLink, Eye, MessageCircleQuestion, Target, X } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { corePillars, corePrograms, type CoreProgram } from "@/data/corePrograms";
 import { lessonGuides } from "@/data/lessonGuides";
@@ -14,6 +14,31 @@ type ModalTab = "overview" | "core" | "record";
 type ProgramGroup = "창체" | "교과";
 
 const isCreativeProgram = (program: CoreProgram) => program.track !== "교과";
+
+const surveys = [
+  {
+    id: "social-emotional",
+    number: "01",
+    label: "첫 번째 설문",
+    title: "사회정서 설문조사",
+    description: "나의 정서와 관계 경험을 돌아보며, 수업 속 성장의 모습을 함께 살펴보는 설문이에요.",
+    link: "https://tinyurl.com/23h3yera",
+    linkText: "tinyurl.com/23h3yera",
+    qrImage: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663649408954/XZldsdJmEKFZKSnA.png",
+    tone: "peach",
+  },
+  {
+    id: "digital-literacy",
+    number: "02",
+    label: "두 번째 설문",
+    title: "디지털 리터러시 설문조사",
+    description: "디지털 정보를 탐색하고 판단하며 활용하는 나의 현재 모습을 점검하는 설문이에요.",
+    link: "http://sp7.kr/ntppIK0",
+    linkText: "sp7.kr/ntppIK0",
+    qrImage: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663649408954/twGrpoRUAmXNJtXb.png",
+    tone: "mint",
+  },
+] as const;
 
 function TrackPill({ program }: { program: CoreProgram }) {
   const isCreative = isCreativeProgram(program);
@@ -98,7 +123,7 @@ export default function Home() {
     <div className="archive-page">
       <header className="simple-header">
         <a href="#top" className="simple-brand"><span><strong>제주중앙고등학교</strong><small>AI·디지털 기반 질문수용 CORE 연구학교</small></span></a>
-        <nav><a href="#lessons">차시별 프로그램</a><a href="#record-guide">기록 작성 안내</a></nav>
+        <nav><a href="#survey-board">설문조사</a><a href="#lessons">차시별 프로그램</a><a href="#record-guide">기록 작성 안내</a></nav>
       </header>
 
       <main id="top">
@@ -114,6 +139,16 @@ export default function Home() {
               <div className="hero-core-steps">{corePillars.map((pillar) => <div key={pillar.key}><b>{pillar.key}</b><span>{pillar.english}</span><em>{pillar.korean}</em></div>)}</div>
             </div>
             <a className="hero-link" href="#lessons">차시별 프로그램 보기 <ChevronRight size={17} /></a>
+          </div>
+        </section>
+
+        <section id="survey-board" className="survey-board-section content-width" aria-labelledby="survey-board-title">
+          <div className="survey-board-heading"><div><p className="kicker orange">SURVEY BOARD</p><h2 id="survey-board-title">연구학교 설문조사</h2><p>아래 설문을 선택하거나 QR 코드를 촬영하면 해당 설문 화면으로 바로 이동해.</p></div><span>2개의 설문</span></div>
+          <div className="survey-grid">
+            {surveys.map((survey) => <article className={`survey-card survey-card--${survey.tone}`} key={survey.id}>
+              <div className="survey-card-body"><div className="survey-card-meta"><span>{survey.number}</span><b>{survey.label}</b></div><h3>{survey.title}</h3><p>{survey.description}</p><a className="survey-open-button" href={survey.link} target="_blank" rel="noreferrer">설문조사 참여하기 <ExternalLink size={17} /></a><a className="survey-link-text" href={survey.link} target="_blank" rel="noreferrer">{survey.linkText} <ExternalLink size={13} /></a></div>
+              <a className="survey-qr-link" href={survey.link} target="_blank" rel="noreferrer" aria-label={`${survey.title} QR 코드로 열기`}><img src={survey.qrImage} alt={`${survey.title} QR 코드`} /><span>QR로 열기 <ExternalLink size={13} /></span></a>
+            </article>)}
           </div>
         </section>
 
