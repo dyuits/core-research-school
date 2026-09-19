@@ -155,3 +155,14 @@ html,body,.archive-page { background:var(--paper); }.archive-page { background:r
 @media (max-width:860px) { .survey-card { grid-template-columns:minmax(0,1fr) 126px; } .survey-qr-link img { width:96px; } }
 @media (max-width:760px) { .simple-header nav { gap:9px; } .simple-header nav a { font-size:12px; } .survey-board-section { padding-top:38px; padding-bottom:19px; } .survey-board-heading { align-items:flex-start; gap:12px; padding-top:19px; } .survey-board-heading h2 { margin-top:4px; font-size:33px; } .survey-board-heading>div>p:not(.kicker) { font-size:14px; line-height:1.6; } .survey-board-heading>span { margin-top:9px; padding:6px 8px; font-size:10px; white-space:nowrap; } .survey-grid { grid-template-columns:1fr; gap:14px; margin-top:19px; } .survey-card { grid-template-columns:minmax(0,1fr) 112px; min-height:0; gap:11px; border-radius:18px; padding:16px; box-shadow:0 4px 0 #dce9e3,0 9px 16px rgba(78,113,104,.08); } .survey-card h3 { margin:11px 0 7px; font-size:20px; } .survey-card-body>p { font-size:13px; line-height:1.55; } .survey-open-button { margin-top:13px; padding:9px 10px; font-size:13px; } .survey-link-text { margin-top:8px; font-size:10px; } .survey-qr-link { gap:6px; border-radius:12px; padding:6px; font-size:10px; } .survey-qr-link img { width:86px; border-radius:5px; } }
 @media (prefers-reduced-motion:reduce) { .survey-card,.survey-open-button,.survey-qr-link { transition:none; } }
+
+/* Design: 교사용 설문은 같은 게시판 안에서 한 줄 전체를 사용해 학생용 설문과 분명히 구분한다. */
+.survey-card:nth-child(3) { grid-column:span 2; grid-template-columns:minmax(0,1fr) 168px; }
+.survey-card--teacher { border-color:#d4e3ee; background:linear-gradient(135deg,#f4f9fd,#fffefd 60%,#edf6fc); }
+.survey-card--teacher .survey-card-meta span { background:#739ab8; }
+.survey-card--teacher .survey-card-meta b { color:#5b8dae; }
+.survey-card--teacher .survey-open-button { background:#5d8fb3; }
+.survey-card--teacher .survey-open-button:hover { background:#477b9f; }
+.survey-card--teacher .survey-link-text { color:#5a8aaa; }
+.survey-card--teacher .survey-qr-link { border-color:#cddfe9; color:#5686a6; }
+@media (max-width:760px) { .survey-card:nth-child(3) { grid-column:auto; grid-template-columns:minmax(0,1fr) 112px; } }
