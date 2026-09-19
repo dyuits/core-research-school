@@ -38,6 +38,17 @@ const surveys = [
     qrImage: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663649408954/twGrpoRUAmXNJtXb.png",
     tone: "mint",
   },
+  {
+    id: "teacher-survey",
+    number: "03",
+    label: "교사용 설문",
+    title: "교사용 설문조사",
+    description: "연구학교 운영을 함께 돌아보고 의견을 나누는 교사용 설문이에요.",
+    link: "https://svybx.kr/sp7/S21136ldo49f/svyF001.asp#noback",
+    linkText: "svybx.kr/sp7/S21136ldo49f",
+    qrImage: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663649408954/VWTHMZfMBSAvHeYl.png",
+    tone: "teacher",
+  },
 ] as const;
 
 function TrackPill({ program }: { program: CoreProgram }) {
@@ -143,7 +154,7 @@ export default function Home() {
         </section>
 
         <section id="survey-board" className="survey-board-section content-width" aria-labelledby="survey-board-title">
-          <div className="survey-board-heading"><div><p className="kicker orange">SURVEY BOARD</p><h2 id="survey-board-title">연구학교 설문조사</h2><p>아래 설문을 선택하거나 QR 코드를 촬영하면 해당 설문 화면으로 바로 이동해.</p></div><span>2개의 설문</span></div>
+          <div className="survey-board-heading"><div><p className="kicker orange">SURVEY BOARD</p><h2 id="survey-board-title">연구학교 설문조사</h2><p>아래 설문을 선택하거나 QR 코드를 촬영하면 해당 설문 화면으로 바로 이동해.</p></div><span>{surveys.length}개의 설문</span></div>
           <div className="survey-grid">
             {surveys.map((survey) => <article className={`survey-card survey-card--${survey.tone}`} key={survey.id}>
               <div className="survey-card-body"><div className="survey-card-meta"><span>{survey.number}</span><b>{survey.label}</b></div><h3>{survey.title}</h3><p>{survey.description}</p><a className="survey-open-button" href={survey.link} target="_blank" rel="noreferrer">설문조사 참여하기 <ExternalLink size={17} /></a><a className="survey-link-text" href={survey.link} target="_blank" rel="noreferrer">{survey.linkText} <ExternalLink size={13} /></a></div>
