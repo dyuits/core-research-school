@@ -11,3 +11,11 @@ https://dyuits.github.io/core-research-school/
 ```
 
 GitHub 저장소의 **Settings → Pages**에서 배포 원본이 **GitHub Actions**로 설정되어 있는지 확인한다.
+
+## 차시·첨부자료 관리자 기능
+
+기존 정적 아카이브에 프로그램·차시·평가·기재 예시·연구자료실 관리 화면과 Node/SQLite 백엔드를 추가했습니다. 원본 파일은 영구 디스크에 저장합니다. GitHub Pages만으로는 관리자 기능을 운영할 수 없습니다.
+
+Node 24 / pnpm 11.25.0 환경에서 `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm test`, `pnpm build`를 실행하세요. `.env.example`을 바탕으로 관리자 암호 해시와 영구 DATA_DIR을 설정한 뒤 `pnpm start`로 서버를 실행합니다.
+
+설치·배포·관리자 사용법·검증 결과·제약은 [구현 및 운영 안내](docs/IMPLEMENTATION.md)를 참고하세요. 비공개 자료·업로드 파일이 들어 있는 DATA_DIR과 실제 .env를 GitHub에 올리지 마세요.
