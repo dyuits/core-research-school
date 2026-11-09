@@ -1,4 +1,6 @@
-import { Download, FileText } from "lucide-react";
+import { Download, FileText, Eye, ExternalLink } from "lucide-react";
+import { lazy, Suspense, useId, useRef, useState } from "react";
+const PdfPreview = lazy(() => import("./PdfPreview"));
 import type { CoreProgram } from "@/data/corePrograms";
 import { pdfMaterials } from "@/data/pdfMaterials";
 import { reportSessions } from "@/data/reportSessions";
@@ -10,6 +12,15 @@ export default function ProgramMaterials({
 }) {
   const files = pdfMaterials.filter(f => f.programId === program.id);
   const sessions = reportSessions.filter(s => s.programId === program.id);
+  const previewId = useId();
+  const previewRef = useRef<HTMLElement>(null);
+  const [previewName, setPreviewName] = useState("");
+  const previewFile =
+    files.find(file => file.file === previewName) ??
+    files.find(file => file.category === "교수·학습 지도안") ??
+    files[0];
+  const pdfUrl = (file: string) =>
+    `${import.meta.env.BASE_URL}materials/${file}`;
   return (
     <div className="program-materials">
       <div className="materials-heading">
@@ -38,16 +49,66 @@ export default function ProgramMaterials({
                 11. 9.
               </p>
             </div>
-            <a
-              href={`${import.meta.env.BASE_URL}materials/${file.file}`}
-              download={file.name}
-            >
-              <Download size={17} aria-hidden="true" />
-              PDF 다운로드<span className="sr-only">: {file.name}</span>
-            </a>
+            <div className="pdf-file-actions">
+              <button
+                type="button"
+                aria-pressed={previewFile?.file === file.file}
+                aria-controls={previewId}
+                onClick={() => {
+                  setPreviewName(file.file);
+                  previewRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }}
+              >
+                <Eye size={17} aria-hidden="true" />
+                미리보기<span className="sr-only">: {file.name}</span>
+              </button>
+              <a href={pdfUrl(file.file)} download={file.name}>
+                <Download size={17} aria-hidden="true" />
+                PDF 다운로드<span className="sr-only">: {file.name}</span>
+              </a>
+            </div>
           </article>
         ))}
       </div>
+      {previewFile && (
+        <section
+          className="pdf-preview"
+          id={previewId}
+          ref={previewRef}
+          aria-label="PDF 미리보기"
+        >
+          <div className="pdf-preview-heading">
+            <div>
+              <h3>지도안·학습자료 미리보기</h3>
+              <p>{previewFile.name}</p>
+            </div>
+            <a
+              href={pdfUrl(previewFile.file)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ExternalLink size={16} aria-hidden="true" />새 탭에서 보기
+              <span className="sr-only">: {previewFile.name}</span>
+            </a>
+          </div>
+          <Suspense
+            fallback={<p role="status">미리보기를 불러오는 중입니다.</p>}
+          >
+            <PdfPreview
+              key={previewFile.file}
+              url={pdfUrl(previewFile.file)}
+              title={previewFile.name}
+            />
+          </Suspense>
+          <p className="pdf-preview-help">
+            미리보기가 표시되지 않거나 모바일에서 전체 쪽을 보려면 ‘새 탭에서
+            보기’를 눌러 주세요. PDF 다운로드도 이용할 수 있습니다.
+          </p>
+        </section>
+      )}
       <section className="source-session-list" aria-label="차시별 학습 내용">
         <h3>차시별 학습 내용</h3>
         <p>
