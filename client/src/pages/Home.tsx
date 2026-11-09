@@ -6,11 +6,13 @@ import { useMemo, useState } from "react";
 import { Check, ChevronRight, ClipboardCheck, Copy, Eye, MessageCircleQuestion, Target, X } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { corePillars, corePrograms, type CoreProgram } from "@/data/corePrograms";
-import { lessonGuides } from "@/data/lessonGuides";
+import { reportGuides as lessonGuides, reportSelFocus as lessonSelFocus } from "@/data/reportGuides";
+import ProgramMaterials from "@/components/ProgramMaterials";
+import { pdfMaterials } from "@/data/pdfMaterials";
+import { siteTitle, siteSubtitle } from "@/data/siteInfo";
 import { recordExamplesByProgram, type GradeLevel } from "@/data/recordExamples";
-import { lessonSelFocus } from "@/data/socialEmotional";
 
-type ModalTab = "overview" | "core" | "record";
+type ModalTab = "overview" | "core" | "record" | "materials";
 type ProgramGroup = "창체" | "교과";
 
 const isCreativeProgram = (program: CoreProgram) => program.track !== "교과";
@@ -24,7 +26,7 @@ function RecordGuide({ program, copied, activeGrade, onGradeChange, onCopy }: { 
   const isCreative = isCreativeProgram(program);
   const isCareer = program.subject.includes("진로");
   const recordArea = isCreative ? (isCareer ? "진로활동 특기사항" : "행동특성·자율활동 관찰 참고") : "교과세부능력 및 특기사항";
-  const gradeExamples = recordExamplesByProgram[program.id] ?? [];
+  const gradeExamples = ["ethics-empathy", "information-ai"].includes(program.id) ? [] : recordExamplesByProgram[program.id] ?? [];
   const selectedExample = gradeExamples.find((example) => example.grade === activeGrade);
   const exampleText = selectedExample?.text ?? program.recordExample ?? "해당 차시의 실제 관찰 장면과 산출물을 확인한 뒤, 수업의 맥락–과정–변화를 연결하여 기재합니다.";
   const guide = isCreative
@@ -78,7 +80,7 @@ export default function Home() {
 
   const openProgram = (program: CoreProgram) => {
     setActiveProgram(program);
-    setModalTab("overview");
+    setModalTab("materials");
     setActiveStep("C");
     setRecordGrade("1학년");
     setCopied(false);
@@ -97,8 +99,8 @@ export default function Home() {
   return (
     <div className="archive-page">
       <header className="simple-header">
-        <a href="#top" className="simple-brand"><span><strong>제주중앙고등학교</strong><small>AI·디지털 기반 질문수용 CORE 연구학교</small></span></a>
-        <nav><a href="#lessons">차시별 프로그램</a><a href="#record-guide">기록 작성 안내</a></nav>
+        <a href="#top" className="simple-brand"><span><strong>제주중앙고등학교</strong><small>{siteSubtitle}</small></span></a>
+        <nav><a href="#lessons">수업지도안·활동지 PDF</a><a href="#record-guide">기록 작성 안내</a></nav>
       </header>
 
       <main id="top">
@@ -106,22 +108,22 @@ export default function Home() {
           <div className="hero-materials" aria-hidden="true"><i /><i /><span>JEJU COAST / FIELD NOTES</span></div>
           <div className="hero-inner">
             <p className="kicker">JEJU JUNGANG HIGH SCHOOL · 2026–2027</p>
-            <h1>질문을 수용하고,<br /><em>생각을 표현하는 수업.</em></h1>
-            <p>AI·디지털 기반 질문수용 CORE 프로그램으로 학생의 <b>사회정서 역량</b>과 <b>디지털 리터러시</b>를 함께 기르는 차시별 활동·기록 자료를 한 곳에 모았어.</p>
+            <h1 className="report-site-title">AI·디지털 활용「CORE」프로그램을 통한<br /><em>질문수용 중심 수업 실천과<br />AI 리터러시 함양</em></h1>
+            <p>연구보고서에 수록된 <b>22차시 CORE 프로그램</b>과 교수·학습 지도안·학생 활동지 <b>PDF 17개</b>를 공유합니다. 질문수용 중심 수업으로 AI 리터러시와 디지털·사회정서 역량을 함께 기릅니다.</p>
             <div className="hero-core-meaning" aria-label="CORE 프로그램의 뜻">
               <div className="hero-core-meaning-title"><span>CORE PROGRAM</span><b>질문을 따라 생각을 완성하는 4단계 학습 흐름</b></div>
               <p>나의 경험과 주제를 <strong>연결</strong>하고, 자료와 관점을 <strong>관찰</strong>한 뒤, 질문으로 <strong>성찰</strong>하여 나만의 언어로 <strong>표현</strong>하고 공유해.</p>
               <div className="hero-core-steps">{corePillars.map((pillar) => <div key={pillar.key}><b>{pillar.key}</b><span>{pillar.english}</span><em>{pillar.korean}</em></div>)}</div>
             </div>
-            <a className="hero-link" href="#lessons">차시별 프로그램 보기 <ChevronRight size={17} /></a>
+            <a className="hero-link" href="#lessons">수업자료 PDF 내려받기 <ChevronRight size={17} /></a>
           </div>
         </section>
 
         <section id="lessons" className="lesson-section content-width">
-          <div className="lesson-heading"><div><p className="kicker orange">LESSON ARCHIVE</p><h2>차시별 프로그램</h2><p>두 개의 수업 항로에서 원하는 차시를 선택하면, CORE 활동과 생활기록부 작성 참고 내용을 팝업에서 확인할 수 있어.</p></div><div className="group-tabs" role="tablist" aria-label="프로그램 항로 선택"><button className={activeGroup === "창체" ? "active" : ""} onClick={() => setActiveGroup("창체")}><span>01</span><div><b>창체 프로그램</b><small>관계 · 진로 · 자기이해</small></div></button><button className={activeGroup === "교과" ? "active" : ""} onClick={() => setActiveGroup("교과")}><span>02</span><div><b>교과수업 프로그램</b><small>탐구 · 분석 · 표현</small></div></button></div></div>
+          <div className="lesson-heading"><div><p className="kicker orange">LESSON ARCHIVE</p><h2>차시별 프로그램</h2><p>창체·교과 프로그램을 선택하면 차시별 학습 내용과 지도안·학생 활동지 PDF를 확인하고 내려받을 수 있습니다.</p></div><div className="group-tabs" role="tablist" aria-label="프로그램 항로 선택"><button className={activeGroup === "창체" ? "active" : ""} onClick={() => setActiveGroup("창체")}><span>01</span><div><b>창체 프로그램</b><small>관계 · 진로 · 자기이해</small></div></button><button className={activeGroup === "교과" ? "active" : ""} onClick={() => setActiveGroup("교과")}><span>02</span><div><b>교과수업 프로그램</b><small>탐구 · 분석 · 표현</small></div></button></div></div>
 
           <div className="lesson-grid">
-            {displayedPrograms.map((program) => { const selFocus = lessonSelFocus[program.id]; return <button className={`lesson-card ${isCreativeProgram(program) ? "creative-card" : "subject-card"}`} onClick={() => openProgram(program)} key={program.id}><div className="lesson-card-top"><span className="lesson-number">{String(program.sequence).padStart(2, "0")}</span><TrackPill program={program} /></div><div className="lesson-card-title"><small>{program.subject}</small><b>{program.title}</b><p>{program.subtitle}</p></div><div className="lesson-sel-chip"><span>사회정서</span><b>{selFocus?.competency}</b></div><div className="card-core"><span>C</span><span>O</span><span>R</span><span>E</span></div><div className="lesson-card-bottom"><span>{program.sessions}</span><em>{program.output}</em><ChevronRight size={18} /></div></button>})}
+            {displayedPrograms.map((program) => { const selFocus = lessonSelFocus[program.id]; return <button className={`lesson-card ${isCreativeProgram(program) ? "creative-card" : "subject-card"}`} onClick={() => openProgram(program)} key={program.id}><div className="lesson-card-top"><span className="lesson-number">{String(program.sequence).padStart(2, "0")}</span><TrackPill program={program} /></div><div className="lesson-card-title"><small>{program.subject}</small><b>{program.title}</b><p>{program.subtitle}</p></div><div className="lesson-sel-chip"><span>사회정서</span><b>{selFocus?.competency}</b></div><div className="card-core"><span>C</span><span>O</span><span>R</span><span>E</span></div><div className="lesson-card-bottom"><span>{program.sessions}</span><em>PDF {pdfMaterials.filter(file => file.programId === program.id).length}개</em><ChevronRight size={18} /></div></button>})}
           </div>
         </section>
 
@@ -130,14 +132,14 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="simple-footer"><div className="simple-brand footer-brand"><span><strong>제주중앙고등학교</strong><small>AI·디지털 기반 질문수용 CORE 연구학교</small></span></div><p>AI·디지털 기반 질문수용 「CORE」프로그램을 통한 학생 정서 회복 및 디지털 리터러시 신장</p></footer>
+      <footer className="simple-footer"><div className="simple-brand footer-brand"><span><strong>제주중앙고등학교</strong><small>{siteSubtitle}</small></span></div><p>{siteTitle}</p></footer>
 
       <Dialog open={Boolean(activeProgram)} onOpenChange={(open) => !open && setActiveProgram(null)}>
         {activeProgram && <DialogContent className="lesson-dialog lesson-dialog--expanded" showCloseButton={false} aria-describedby="lesson-dialog-description">
           <div className="dialog-topbar"><div><TrackPill program={activeProgram} /><span>{activeProgram.sessions}</span></div><DialogClose className="dialog-close" aria-label="팝업 닫기"><X size={20} /></DialogClose></div>
           <div className="dialog-heading"><small>{activeProgram.subject}</small><DialogTitle>{activeProgram.title}</DialogTitle><DialogDescription id="lesson-dialog-description">{activeProgram.subtitle}</DialogDescription></div>
-          <div className="dialog-tabs" role="tablist"><button className={modalTab === "overview" ? "active" : ""} onClick={() => setModalTab("overview")} role="tab" aria-selected={modalTab === "overview"}>수업 개요</button><button className={modalTab === "core" ? "active" : ""} onClick={() => setModalTab("core")} role="tab" aria-selected={modalTab === "core"}>CORE 활동</button><button className={modalTab === "record" ? "active" : ""} onClick={() => setModalTab("record")} role="tab" aria-selected={modalTab === "record"}>{isCreativeProgram(activeProgram) ? "창체 기록 작성" : "교과세특 작성"}</button></div>
-          {modalTab === "overview" ? <div className="overview-tab-content"><div className="overview-top-grid"><section className="overview-goal"><Target size={20} /><div><span>수업 목표</span><p>{activeProgram.goal}</p></div></section><section className="overview-output"><Eye size={20} /><div><span>산출물·증거</span><p>{currentGuide?.evidence ?? activeProgram.output}</p></div></section></div><section className="teacher-question"><MessageCircleQuestion size={22} /><div><span>핵심 교사 발문</span><p>“{currentGuide?.teacherPrompt}”</p></div></section><div className="overview-activity-flow"><div className="overview-section-title"><b>차시 활동 흐름</b><span>활동 장면을 확인하고 기록 근거로 연결해요.</span></div>{activeProgram.steps.map((step) => <article key={step.key}><strong>{step.key}</strong><div><b>{step.label}</b><p>{step.text}</p></div></article>)}</div><div className="assessment-block"><div className="overview-section-title"><b>평가 관찰 포인트</b><span>수업 중 발언·기록·산출물에서 확인해요.</span></div><div>{currentGuide?.assessmentPoints.map((point, index) => <p key={point}><span>0{index + 1}</span>{point}</p>)}</div></div></div> : modalTab === "core" ? <div className="core-tab-content"><div className="core-step-tabs">{activeProgram.steps.map((step) => <button key={step.key} className={activeStep === step.key ? "active" : ""} onClick={() => setActiveStep(step.key)}><strong>{step.key}</strong><span>{step.label}</span></button>)}</div><div className="step-detail"><span>{currentStep?.key}</span><div><b>{currentStep?.label} · {corePillars.find((pillar) => pillar.key === currentStep?.key)?.korean}</b><p>{currentStep?.text}</p></div></div><div className="activity-meta"><div><span>수업 목표</span><p>{activeProgram.goal}</p></div><div><span>활용 도구</span><p>{activeProgram.tools.join(" · ")}</p></div><div><span>산출물</span><p>{activeProgram.output}</p></div></div></div> : <RecordGuide program={activeProgram} copied={copied} activeGrade={recordGrade} onGradeChange={setRecordGrade} onCopy={copyRecord} />}
+          <div className="dialog-tabs" role="tablist"><button className={modalTab === "materials" ? "active" : ""} onClick={() => setModalTab("materials")} role="tab" aria-selected={modalTab === "materials"}>PDF 수업자료 ({pdfMaterials.filter(file => file.programId === activeProgram.id).length})</button><button className={modalTab === "overview" ? "active" : ""} onClick={() => setModalTab("overview")} role="tab" aria-selected={modalTab === "overview"}>수업 개요</button><button className={modalTab === "core" ? "active" : ""} onClick={() => setModalTab("core")} role="tab" aria-selected={modalTab === "core"}>CORE 활동</button><button className={modalTab === "record" ? "active" : ""} onClick={() => setModalTab("record")} role="tab" aria-selected={modalTab === "record"}>{isCreativeProgram(activeProgram) ? "창체 기록 작성" : "교과세특 작성"}</button></div>
+          {modalTab === "materials" ? <ProgramMaterials program={activeProgram} /> : modalTab === "overview" ? <div className="overview-tab-content"><div className="overview-top-grid"><section className="overview-goal"><Target size={20} /><div><span>수업 목표</span><p>{activeProgram.goal}</p></div></section><section className="overview-output"><Eye size={20} /><div><span>산출물·증거</span><p>{currentGuide?.evidence ?? activeProgram.output}</p></div></section></div><section className="teacher-question"><MessageCircleQuestion size={22} /><div><span>핵심 교사 발문</span><p>“{currentGuide?.teacherPrompt}”</p></div></section><div className="overview-activity-flow"><div className="overview-section-title"><b>차시 활동 흐름</b><span>활동 장면을 확인하고 기록 근거로 연결해요.</span></div>{activeProgram.steps.map((step) => <article key={step.key}><strong>{step.key}</strong><div><b>{step.label}</b><p>{step.text}</p></div></article>)}</div><div className="assessment-block"><div className="overview-section-title"><b>평가 관찰 포인트</b><span>수업 중 발언·기록·산출물에서 확인해요.</span></div><div>{currentGuide?.assessmentPoints.map((point, index) => <p key={point}><span>0{index + 1}</span>{point}</p>)}</div></div></div> : modalTab === "core" ? <div className="core-tab-content"><div className="core-step-tabs">{activeProgram.steps.map((step) => <button key={step.key} className={activeStep === step.key ? "active" : ""} onClick={() => setActiveStep(step.key)}><strong>{step.key}</strong><span>{step.label}</span></button>)}</div><div className="step-detail"><span>{currentStep?.key}</span><div><b>{currentStep?.label} · {corePillars.find((pillar) => pillar.key === currentStep?.key)?.korean}</b><p>{currentStep?.text}</p></div></div><div className="activity-meta"><div><span>수업 목표</span><p>{activeProgram.goal}</p></div><div><span>활용 도구</span><p>{activeProgram.tools.join(" · ")}</p></div><div><span>산출물</span><p>{activeProgram.output}</p></div></div></div> : <RecordGuide program={activeProgram} copied={copied} activeGrade={recordGrade} onGradeChange={setRecordGrade} onCopy={copyRecord} />}
         </DialogContent>}
       </Dialog>
     </div>

@@ -11,3 +11,9 @@ https://dyuits.github.io/core-research-school/
 ```
 
 GitHub 저장소의 **Settings → Pages**에서 배포 원본이 **GitHub Actions**로 설정되어 있는지 확인한다.
+
+## PDF 수업자료
+
+ver25 연구보고서 기준 제목과 22차시 편성을 반영했습니다. 프로그램 카드를 선택하면 ‘PDF 수업자료’에서 지도안과 학생 활동지 17개를 다운로드할 수 있습니다. 실제 PDF 파일은 `client/public/materials/`에 보관합니다.
+
+자료 구성과 원본 대조·변환·검증 방법은 [PDF 자료 공개 안내](docs/PDF_MATERIALS.md)를 참고하세요. 검사는 `pnpm test:materials`로 실행합니다.
