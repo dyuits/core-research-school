@@ -89,11 +89,18 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
       .then(config => {
         const url = new URL(config.endpoint);
         if (url.protocol !== "https:") throw new Error();
-        return fetch(`${url.toString()}?action=status`).then(async response=>{const status=await response.json();if(!response.ok||!status.ready)throw new Error('사진 저장소 연결이 아직 완료되지 않았습니다.');if(alive)setEndpoint(url.toString());});
+        return fetch(`${url.toString()}?action=status`).then(async response => {
+          const status = await response.json();
+          if (!response.ok || !status.ready)
+            throw new Error("사진 저장소 연결이 아직 완료되지 않았습니다.");
+          if (alive) setEndpoint(url.toString());
+        });
       })
       .catch(() => {
         if (alive) {
-          setError("사진 저장소 연결이 아직 완료되지 않았습니다. 연결 후 사진 등록·공유를 사용할 수 있습니다.");
+          setError(
+            "사진 저장소 연결이 아직 완료되지 않았습니다. 연결 후 사진 등록·공유를 사용할 수 있습니다."
+          );
           setLoading(false);
         }
       });
