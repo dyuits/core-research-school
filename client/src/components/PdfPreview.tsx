@@ -11,12 +11,14 @@ function PdfPage({
   document,
   page,
   width,
+  height,
   zoom,
   title,
 }: {
   document: PDFDocumentProxy;
   page: number;
   width: number;
+  height: number;
   zoom: number;
   title: string;
 }) {
@@ -30,8 +32,10 @@ function PdfPage({
     const render = async () => {
       const pdfPage = await document.getPage(page);
       if (!active || !canvas.current) return;
+      const original = pdfPage.getViewport({ scale: 1 });
       const viewport = pdfPage.getViewport({
-        scale: (width / pdfPage.getViewport({ scale: 1 }).width) * zoom,
+        scale:
+          Math.min(width / original.width, height / original.height) * zoom,
       });
       const element = canvas.current;
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -55,7 +59,7 @@ function PdfPage({
       active = false;
       task?.cancel();
     };
-  }, [document, page, width, zoom]);
+  }, [document, page, width, height, zoom]);
   return (
     <>
       {status && <p role="status">{status}</p>}
@@ -74,7 +78,7 @@ export default function PdfPreview({
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
   const [zoom, setZoom] = useState(1);
-  const [width, setWidth] = useState(700);
+  const [size, setSize] = useState({ width: 700, height: 450 });
   const container = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let active = true;
@@ -98,7 +102,10 @@ export default function PdfPreview({
     const element = container.current;
     if (!element) return;
     const observer = new ResizeObserver(() =>
-      setWidth(Math.max(200, element.clientWidth - 32))
+      setSize({
+        width: Math.max(100, element.clientWidth - 32),
+        height: Math.max(100, element.clientHeight - 32),
+      })
     );
     observer.observe(element);
     return () => observer.disconnect();
@@ -136,6 +143,13 @@ export default function PdfPreview({
           >
             −
           </button>
+          <button
+            type="button"
+            onClick={() => setZoom(1)}
+            aria-pressed={zoom === 1}
+          >
+            한 쪽 맞춤
+          </button>
           <span>{Math.round(zoom * 100)}%</span>
           <button
             type="button"
@@ -156,10 +170,11 @@ export default function PdfPreview({
       >
         {document && (
           <PdfPage
-            key={`${page}-${width}-${zoom}`}
+            key={`${page}-${size.width}-${size.height}-${zoom}`}
             document={document}
             page={page}
-            width={width}
+            width={size.width}
+            height={size.height}
             zoom={zoom}
             title={title}
           />
