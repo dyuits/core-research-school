@@ -11,6 +11,7 @@ import ProgramMaterials from "@/components/ProgramMaterials";
 import LessonPhotos from "@/components/LessonPhotos";
 import LessonSlides from "@/components/LessonSlides";
 import LessonSummary from "@/components/LessonSummary";
+import ResearchTables from "@/components/ResearchTables";
 import { pdfMaterials } from "@/data/pdfMaterials";
 import { siteTitle, siteSubtitle } from "@/data/siteInfo";
 import { recordExamplesByProgram, type GradeLevel } from "@/data/recordExamples";
@@ -103,7 +104,7 @@ export default function Home() {
     <div className="archive-page">
       <header className="simple-header">
         <a href="#top" className="simple-brand"><span><strong>제주중앙고등학교</strong><small>{siteSubtitle}</small></span></a>
-        <nav><a href="#lessons">수업지도안·활동지 PDF</a><a href="#record-guide">기록 작성 안내</a></nav>
+        <nav><a href="#lessons">수업지도안·활동지 PDF</a><a href="#research-tables">CORE·영역별 학습</a><a href="#record-guide">기록 작성 안내</a></nav>
       </header>
 
       <main id="top">
@@ -129,6 +130,8 @@ export default function Home() {
             {displayedPrograms.map((program) => { const selFocus = lessonSelFocus[program.id]; return <button className={`lesson-card ${isCreativeProgram(program) ? "creative-card" : "subject-card"}`} onClick={() => openProgram(program)} key={program.id}><div className="lesson-card-top"><span className="lesson-number">{String(program.sequence).padStart(2, "0")}</span><TrackPill program={program} /></div><div className="lesson-card-title"><small>{program.subject}</small><b>{program.title}</b><p>{program.subtitle}</p></div><div className="lesson-sel-chip"><span>사회정서</span><b>{selFocus?.competency}</b></div><div className="card-core"><span>C</span><span>O</span><span>R</span><span>E</span></div><div className="lesson-card-bottom"><span>{program.sessions}</span><em>PDF {pdfMaterials.filter(file => file.programId === program.id).length}개</em><ChevronRight size={18} /></div></button>})}
           </div>}
         </section>
+
+        <ResearchTables />
 
         <section id="record-guide" className="record-guide-band">
           <div className="content-width record-guide-inner"><div><p className="kicker orange">RECORD WRITING GUIDE</p><h2>활동을 나열하지 않고,<br /><em>과정과 변화</em>를 기록합니다.</h2></div><p>창체는 학생의 참여·관계·진로 탐색 과정에, 교과는 성취기준과 연결된 탐구·분석·표현 과정에 초점을 두어 기록해. 각 차시 팝업의 <b>‘기록 작성’</b> 탭에서 작성 방법과 기재 예시를 확인할 수 있어.</p></div>
