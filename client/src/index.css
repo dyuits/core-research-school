@@ -145,9 +145,9 @@ html,body,.archive-page { background:var(--paper); }.archive-page { background:r
 .lesson-summary h3 { font-size: 23px; font-weight: 800; }
 .lesson-summary > p { margin: 10px 0 18px; font-size: 14px; line-height: 1.8; }
 .lesson-summary-table { width: 100%; min-width: 0; max-width: 100%; border: 1px solid #bdcfc4; border-radius: 14px; background: white; }
-.lesson-summary table { width: 100%; min-width: 0; border-collapse: collapse; table-layout: fixed; font-size: 14px; line-height: 1.8; }
-.lesson-summary th, .lesson-summary td { padding: 12px 8px; border-right: 1px solid #dce8e1; border-bottom: 1px solid #dce8e1; text-align: left; vertical-align: top; white-space: pre-line; overflow-wrap: anywhere; }
-.lesson-summary thead th { background: #285b4d; color: white; font-weight: 700; }
+.lesson-summary table { width: 100%; min-width: 0; border-collapse: collapse; table-layout: fixed; font-size: 17px; line-height: 1.85; }
+.lesson-summary th, .lesson-summary td { padding: 20px 10px; border-right: 1px solid #dce8e1; border-bottom: 1px solid #dce8e1; text-align: left; vertical-align: middle; white-space: pre-line; word-break: keep-all; overflow-wrap: anywhere; }
+.lesson-summary thead th { background: #285b4d; color: white; font-weight: 700; text-align: center; line-height: 1.6; }
 .lesson-summary th:first-child { width: 7%; }
 .lesson-summary th:nth-child(2) { width: 9%; }
 .lesson-summary th:nth-child(3) { width: 18%; }
@@ -155,13 +155,14 @@ html,body,.archive-page { background:var(--paper); }.archive-page { background:r
 .lesson-summary th:nth-child(5) { width: 21%; }
 .lesson-summary th:nth-child(6) { width: 16%; }
 .lesson-summary th:nth-child(7) { width: 8%; }
-.lesson-summary tbody th { background: #edf5ef; font-weight: 800; }
+.lesson-summary tbody th { background: #edf5ef; font-weight: 800; text-align: center; }
+.lesson-summary tbody td:nth-child(2), .lesson-summary tbody td:last-child { text-align: center; }
 .lesson-summary tbody tr:nth-child(even) td { background: #f6f9f5; }
 .lesson-summary tr > :last-child { border-right: 0; }
 .lesson-summary tbody tr:last-child > * { border-bottom: 0; }
 @media (max-width: 760px) { .archive-page .group-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); } .archive-page .group-tabs button { flex-direction: row; align-items: center; } }
 
 @media (max-width: 760px) {
-  .lesson-summary table { font-size: 11px; line-height: 1.65; }
-  .lesson-summary th, .lesson-summary td { padding: 8px 3px; }
+  .lesson-summary table { font-size: 13px; line-height: 1.8; }
+  .lesson-summary th, .lesson-summary td { padding: 14px 4px; }
 }
