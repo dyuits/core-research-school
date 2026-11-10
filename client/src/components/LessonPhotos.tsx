@@ -59,6 +59,7 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
   const sessions = reportSessions.filter(s => s.programId === program.id);
   const [session, setSession] = useState(sessions[0]?.number ?? 1);
   const [endpoint, setEndpoint] = useState("");
+  const [storageReady, setStorageReady] = useState(false);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [page, setPage] = useState<{ cursor: string | null; hasMore: boolean }>(
     { cursor: null, hasMore: false }
@@ -91,9 +92,13 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
         if (url.protocol !== "https:") throw new Error();
         return fetch(`${url.toString()}?action=status`).then(async response => {
           const status = await response.json();
-          if (!response.ok || !status.ready)
+          if (!response.ok)
             throw new Error("사진 저장소 연결이 아직 완료되지 않았습니다.");
-          if (alive) setEndpoint(url.toString());
+          if (alive) {
+            setEndpoint(url.toString());
+            setStorageReady(status.ready);
+            setLoading(false);
+          }
         });
       })
       .catch(() => {
@@ -109,7 +114,7 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
     };
   }, []);
   useEffect(() => {
-    if (!endpoint) return;
+    if (!endpoint || !storageReady) return;
     let alive = true;
     setLoading(true);
     setError("");
@@ -138,7 +143,7 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
     return () => {
       alive = false;
     };
-  }, [endpoint, program.id, session, version]);
+  }, [endpoint, storageReady, program.id, session, version]);
   async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
     const response = await fetch(url, init);
     const data = await response.json();
@@ -220,6 +225,12 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
   return (
     <section className="lesson-photos" aria-label="차시별 수업활동 사진">
       <h3>차시별 수업활동 사진</h3>
+      {endpoint && !storageReady && (
+        <p className="photo-error">
+          관리자 로그인은 가능합니다. 사진·PPT 등록 및 공유는 파일 저장소 연결
+          후 사용할 수 있습니다.
+        </p>
+      )}
       <p>공개된 사진은 로그인하지 않은 선생님도 볼 수 있습니다.</p>
       <label className="photo-session-label">
         수업 차시
@@ -394,7 +405,7 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
                 학생 얼굴·성명·학번·명찰·활동지의 식별 정보가 드러나지 않도록
                 처리했고, 사진 공개에 필요한 동의·초상권을 확인했습니다.
               </label>
-              <button disabled={busy || !endpoint}>
+              <button disabled={busy || !endpoint || !storageReady}>
                 {busy ? "사진 등록 중…" : "사진 등록 및 공개"}
               </button>
             </form>

@@ -520,3 +520,8 @@ body,
 .compact-hero::after { border-color: #8fcff1 transparent transparent #8fcff1; }
 .compact-hero .kicker { color: #356c92; }
 .lesson-card::before { color: #496b83; opacity: 1; }
+
+.slide-list { list-style:none; padding:0; display:grid; gap:12px; }
+.slide-list li { display:flex; align-items:center; flex-wrap:wrap; gap:14px; padding:18px; border:1px solid #bae6fd; background:#f0f9ff; border-radius:14px; }
+.slide-list li > div { flex:1; min-width:160px; overflow-wrap:anywhere; }
+.slide-download { color:#0369a1; font-weight:700; text-decoration:underline; padding:10px; }

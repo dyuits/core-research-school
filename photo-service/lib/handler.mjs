@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import sharp from "sharp";
+import { slideRequest } from "./slides.mjs";
 import { checkPassword, isAdmin, issueToken } from "./auth.mjs";
 import lessonMap from "../lesson-map.json" with { type: "json" };
 const MAX_IMAGE = 2 * 1024 * 1024;
@@ -76,18 +77,30 @@ export function createHandler(
         throw new HttpError(503, "사진 관리 서버 설정이 필요합니다.");
       const action = url.searchParams.get("action");
       if (request.method === "GET" && action === "status")
-        return json({ ready: store.ready !== false });
-      if (store.ready === false)
-        throw new HttpError(
-          503,
-          "사진 저장소 연결이 아직 완료되지 않았습니다."
-        );
+        return json({ ready: store.ready !== false, loginReady: true });
       if (request.method === "POST" && action === "login") {
         const body = await readBody(request);
         if (!checkPassword(body.password, passwordHash))
           throw new HttpError(401, "관리자 암호가 올바르지 않습니다.");
         return json({ token: issueToken(authSecret) });
       }
+      if (store.ready === false)
+        throw new HttpError(
+          503,
+          "사진 저장소 연결이 아직 완료되지 않았습니다."
+        );
+      if (action?.startsWith("slide"))
+        return await slideRequest({
+          request,
+          url,
+          store,
+          authSecret,
+          json,
+          cors,
+          lesson,
+          readBody,
+          HttpError,
+        });
       if (!["GET", "POST", "DELETE"].includes(request.method))
         throw new HttpError(405, "지원하지 않는 요청입니다.");
       if (

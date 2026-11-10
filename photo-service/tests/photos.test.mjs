@@ -161,3 +161,120 @@ test("토큰 위조·만료와 미연결 저장소를 차단한다", async () =>
   assert.equal((await status.json()).ready, false);
   assert.equal((await handler(new Request(url + location))).status, 503);
 });
+test("저장소가 없어도 로그인은 가능하고 잘못된 암호는 거절한다", async () => {
+  const h = createHandler(
+    { ...storage(), ready: false },
+    { passwordHash, authSecret: secret }
+  );
+  assert.equal((await h(req("?action=login", { password }))).status, 200);
+  assert.equal(
+    (await h(req("?action=login", { password: "wrong" }))).status,
+    401
+  );
+});
+test("PPTX 형식 검증, 원본 무결성, 익명 다운로드 및 공개 취소", async () => {
+  const { default: AdmZip } = await import("adm-zip");
+  const { validateSlide } = await import("../lib/slides.mjs");
+  const zip = new AdmZip();
+  zip.addFile(
+    "[Content_Types].xml",
+    Buffer.from(
+      '<Types><Override ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/></Types>'
+    )
+  );
+  zip.addFile("ppt/presentation.xml", Buffer.from("<p:presentation/>"));
+  const bytes = zip.toBuffer();
+  validateSlide(bytes, "pptx");
+  const { default: CFB } = await import("cfb");
+  const cfb = CFB.utils.cfb_new();
+  CFB.utils.cfb_add(
+    cfb,
+    "PowerPoint Document",
+    Buffer.from("PowerPoint binary test stream")
+  );
+  validateSlide(CFB.write(cfb, { type: "buffer" }), "ppt");
+  assert.throws(() => validateSlide(Buffer.from("renamed text"), "pptx"));
+  assert.throws(() => validateSlide(Buffer.from("renamed text"), "ppt"));
+  const store = storage();
+  const h = createHandler(store, { passwordHash, authSecret: secret });
+  const token = issueToken(secret);
+  const id = "f5db21d1-b4a4-4c48-907e-6c5961f734fe";
+  const path = `slides/creative-reading/1/${id}.pptx`;
+  store.data.set(path, bytes);
+  const data = {
+    programId: "creative-reading",
+    session: 1,
+    id,
+    ext: "pptx",
+    name: "수업 발표.pptx",
+    privacyConfirmed: true,
+  };
+  assert.equal((await h(req("?action=slide-finalize", data))).status, 401);
+  assert.equal(
+    (
+      await h(
+        req("?action=slide-upload", {
+          type: "blob.generate-client-token",
+          payload: { pathname: path, clientPayload: JSON.stringify(data) },
+        })
+      )
+    ).status,
+    401
+  );
+  assert.equal(
+    (
+      await h(
+        req(
+          "?action=slide-finalize",
+          { ...data, privacyConfirmed: false },
+          token
+        )
+      )
+    ).status,
+    400
+  );
+  assert.equal(
+    (await h(req("?action=slide-finalize", data, token))).status,
+    201
+  );
+  const other = createHandler(store, { passwordHash, authSecret: secret });
+  const list = await (
+    await other(new Request(url + location + "&action=slides"))
+  ).json();
+  assert.equal(list.items.length, 1);
+  const download = await other(new Request(list.items[0].downloadUrl));
+  assert.equal(download.status, 200);
+  assert.deepEqual(Buffer.from(await download.arrayBuffer()), bytes);
+  assert.match(download.headers.get("Content-Disposition"), /filename\*=UTF-8/);
+  assert.equal(
+    (
+      await other(
+        req(
+          location + `&action=slides&fileId=${id}`,
+          undefined,
+          undefined,
+          "DELETE"
+        )
+      )
+    ).status,
+    401
+  );
+  assert.equal(
+    (
+      await other(
+        req(
+          location + `&action=slides&fileId=${id}`,
+          undefined,
+          token,
+          "DELETE"
+        )
+      )
+    ).status,
+    200
+  );
+  assert.equal(
+    (await other(new Request(list.items[0].downloadUrl))).status,
+    404
+  );
+  assert.ok(store.data.has(path), "공개 취소 시 원본을 삭제하지 않는다");
+});
