@@ -1,6 +1,14 @@
 import { useEffect, useState, type FormEvent } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import PhotoUploadField from "./PhotoUploadField";
 import type { CoreProgram } from "@/data/corePrograms";
-import { reportSessions } from "@/data/reportSessions";
+import { mediaSessionsFor } from "@/data/mediaSessions";
+import { isFestivalProgram } from "@/data/festivalPrograms";
 type Photo = {
   id: string;
   caption: string;
@@ -56,7 +64,9 @@ async function preparePhoto(file: File): Promise<string> {
   }
 }
 export default function LessonPhotos({ program }: { program: CoreProgram }) {
-  const sessions = reportSessions.filter(s => s.programId === program.id);
+  const sessions = mediaSessionsFor(program);
+  const festival = isFestivalProgram(program);
+  const activityLabel = festival ? "축제 활동" : "수업 차시";
   const [session, setSession] = useState(sessions[0]?.number ?? 1);
   const [endpoint, setEndpoint] = useState("");
   const [storageReady, setStorageReady] = useState(false);
@@ -70,6 +80,8 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [version, setVersion] = useState(0);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewPhoto, setPreviewPhoto] = useState<Photo | null>(null);
   function remember(value: string) {
     setToken(value);
     try {
@@ -118,7 +130,6 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
     let alive = true;
     setLoading(true);
     setError("");
-    setPhotos([]);
     const url = new URL(endpoint);
     url.searchParams.set("programId", program.id);
     url.searchParams.set("session", String(session));
@@ -193,10 +204,11 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
     void run(async () => {
       if (!picked.length) throw new Error("사진을 선택하세요.");
       let uploaded = 0;
+      let lastUploaded: Photo | null = null;
       try {
         for (const file of picked) {
           const image = await preparePhoto(file);
-          await request(endpoint, {
+          const saved = await request<Omit<Photo, "imageUrl">>(endpoint, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -210,10 +222,24 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
               image,
             }),
           });
+          const imageUrl = new URL(endpoint);
+          imageUrl.search = new URLSearchParams({
+            programId: program.id,
+            session: String(session),
+            imageId: saved.id,
+          }).toString();
+          lastUploaded = { ...saved, imageUrl: imageUrl.toString() };
+          const publishedPhoto = lastUploaded;
+          setPhotos(previous => [
+            publishedPhoto,
+            ...previous.filter(photo => photo.id !== publishedPhoto.id),
+          ]);
           uploaded++;
           setNotice(`${uploaded}/${picked.length}장 등록 완료`);
         }
         form.reset();
+        setSelectedFiles([]);
+        setPreviewPhoto(lastUploaded);
         setNotice(
           `${uploaded}장을 공개했습니다. 다른 선생님도 이 차시에서 볼 수 있습니다.`
         );
@@ -224,7 +250,7 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
   }
   return (
     <section className="lesson-photos" aria-label="차시별 수업활동 사진">
-      <h3>차시별 수업활동 사진</h3>
+      <h3>{festival ? "축제활동 사진" : "차시별 수업활동 사진"}</h3>
       {endpoint && !storageReady && (
         <p className="photo-error">
           관리자 로그인은 가능합니다. 사진·PPT 등록 및 공유는 파일 저장소 연결
@@ -233,18 +259,21 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
       )}
       <p>공개된 사진은 로그인하지 않은 선생님도 볼 수 있습니다.</p>
       <label className="photo-session-label">
-        수업 차시
+        {activityLabel}
         <select
           value={session}
           disabled={busy}
           onChange={e => {
             setSession(Number(e.target.value));
+            setPhotos([]);
+            setPage({ cursor: null, hasMore: false });
+            setPreviewPhoto(null);
             setNotice("");
           }}
         >
           {sessions.map(s => (
             <option key={s.number} value={s.number}>
-              {s.number}차시 · {s.title.replace(/^⦁\s*/, "")}
+              {s.label}
             </option>
           ))}
         </select>
@@ -260,7 +289,7 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
         </p>
       )}
       <div className="photo-gallery-heading">
-        <h4>{session}차시 공개 사진</h4>
+        <h4>{festival ? program.title : `${session}차시`} 공개 사진</h4>
         <button
           type="button"
           disabled={busy || loading || !endpoint}
@@ -277,10 +306,10 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
       <div className="photo-gallery">
         {photos.map(photo => (
           <figure key={photo.id}>
-            <a
-              href={photo.imageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              className="photo-preview-trigger"
+              onClick={() => setPreviewPhoto(photo)}
               aria-label={`${photo.caption} 사진 크게 보기`}
             >
               <img
@@ -290,7 +319,8 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
                 height={photo.height}
                 loading="lazy"
               />
-            </a>
+              <span>사진 크게 보기 ↗</span>
+            </button>
             <figcaption>
               <p>{photo.caption}</p>
               <small>
@@ -373,7 +403,8 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
             <form onSubmit={upload}>
               <p>
                 <b>
-                  {program.title} · {session}차시
+                  {program.title}
+                  {!festival && ` · ${session}차시`}
                 </b>
                 에 등록합니다.
               </p>
@@ -386,16 +417,11 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
                   placeholder="수업 중 어떤 활동인지 설명해 주세요."
                 />
               </label>
-              <label>
-                활동 사진 (여러 장 선택 가능)
-                <input
-                  type="file"
-                  name="photos"
-                  multiple
-                  required
-                  accept="image/jpeg,image/png,image/webp"
-                />
-              </label>
+              <PhotoUploadField
+                files={selectedFiles}
+                onChange={setSelectedFiles}
+                disabled={busy}
+              />
               <p>
                 JPG·PNG·WebP, 원본 파일당 20MB 이하. 공개용 사진은 자동으로
                 크기를 조정하고 위치정보 등 메타데이터를 제거합니다.
@@ -412,6 +438,68 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
           </>
         )}
       </details>
+      <Dialog
+        open={Boolean(previewPhoto)}
+        onOpenChange={open => !open && setPreviewPhoto(null)}
+      >
+        {previewPhoto && (
+          <DialogContent
+            className="photo-lightbox"
+            aria-describedby="photo-lightbox-description"
+          >
+            <DialogTitle>활동 사진 미리보기</DialogTitle>
+            <DialogDescription id="photo-lightbox-description">
+              {previewPhoto.caption}
+            </DialogDescription>
+            <img
+              src={previewPhoto.imageUrl}
+              alt={previewPhoto.caption}
+              width={previewPhoto.width}
+              height={previewPhoto.height}
+            />
+            <div className="photo-lightbox-actions">
+              <button
+                type="button"
+                disabled={
+                  photos.findIndex(photo => photo.id === previewPhoto.id) <= 0
+                }
+                onClick={() => {
+                  const index = photos.findIndex(
+                    photo => photo.id === previewPhoto.id
+                  );
+                  if (index > 0) setPreviewPhoto(photos[index - 1]);
+                }}
+              >
+                이전 사진
+              </button>
+              <a
+                href={previewPhoto.imageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                새 탭에서 원본 보기
+              </a>
+              <button
+                type="button"
+                disabled={
+                  photos.findIndex(photo => photo.id === previewPhoto.id) < 0 ||
+                  photos.findIndex(photo => photo.id === previewPhoto.id) >=
+                    photos.length - 1
+                }
+                onClick={() => {
+                  const index = photos.findIndex(
+                    photo => photo.id === previewPhoto.id
+                  );
+                  if (index >= 0 && index < photos.length - 1)
+                    setPreviewPhoto(photos[index + 1]);
+                }}
+              >
+                다음 사진
+              </button>
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
     </section>
   );
 }

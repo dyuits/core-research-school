@@ -86,5 +86,21 @@
   {
     "programId": "creative-shortform",
     "number": 22
+  },
+  {
+    "programId": "festival-drone",
+    "number": 1
+  },
+  {
+    "programId": "festival-goldenbell",
+    "number": 1
+  },
+  {
+    "programId": "festival-shortform",
+    "number": 1
+  },
+  {
+    "programId": "festival-music",
+    "number": 1
   }
 ]

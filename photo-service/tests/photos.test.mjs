@@ -278,3 +278,50 @@ test("PPTX 형식 검증, 원본 무결성, 익명 다운로드 및 공개 취�
   );
   assert.ok(store.data.has(path), "공개 취소 시 원본을 삭제하지 않는다");
 });
+
+test("축제 4개 활동의 사진 등록·익명 열람과 PPT 목록, 정규 차시와의 분리", async () => {
+  const store = storage();
+  const handler = createHandler(store, { passwordHash, authSecret: secret });
+  const token = issueToken(secret);
+  const image = (
+    await sharp({
+      create: { width: 80, height: 60, channels: 3, background: "#c5a87c" },
+    })
+      .png()
+      .toBuffer()
+  ).toString("base64");
+  for (const name of ["drone", "goldenbell", "shortform", "music"]) {
+    const programId = `festival-${name}`;
+    const body = {
+      programId,
+      session: 1,
+      caption: "축제 검증용 사진",
+      privacyConfirmed: true,
+      image,
+    };
+    assert.equal((await handler(req("", body))).status, 401);
+    assert.equal((await handler(req("", body, token))).status, 201);
+    const list = await handler(
+      new Request(`${url}?programId=${programId}&session=1`)
+    );
+    assert.equal(list.status, 200);
+    const { items } = await list.json();
+    assert.equal(items.length, 1);
+    assert.equal((await handler(new Request(items[0].imageUrl))).status, 200);
+    assert.equal(
+      (
+        await handler(
+          new Request(`${url}?action=slides&programId=${programId}&session=1`)
+        )
+      ).status,
+      200
+    );
+    assert.equal(
+      (await handler(new Request(`${url}?programId=${programId}&session=23`)))
+        .status,
+      400
+    );
+  }
+  const regular = await (await handler(new Request(url + location))).json();
+  assert.equal(regular.items.length, 0);
+});

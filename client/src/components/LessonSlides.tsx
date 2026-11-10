@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { CoreProgram } from "@/data/corePrograms";
-import { reportSessions } from "@/data/reportSessions";
+import { mediaSessionsFor } from "@/data/mediaSessions";
+import { isFestivalProgram } from "@/data/festivalPrograms";
 const tokenKey = "core-photo-admin-session";
 type Slide = {
   id: string;
@@ -13,7 +14,9 @@ type Slide = {
 };
 type Page = { items: Slide[]; cursor: string | null; hasMore: boolean };
 export default function LessonSlides({ program }: { program: CoreProgram }) {
-  const sessions = reportSessions.filter(s => s.programId === program.id);
+  const sessions = mediaSessionsFor(program);
+  const festival = isFestivalProgram(program);
+  const activityLabel = festival ? "축제 활동" : "수업 차시";
   const [session, setSession] = useState(sessions[0]?.number ?? 1);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [endpoint, setEndpoint] = useState("");
@@ -195,10 +198,10 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
   }
   return (
     <section className="lesson-photos" aria-label="차시별 수업 PPT">
-      <h3>차시별 수업 PPT</h3>
+      <h3>{festival ? "축제 활동 PPT" : "차시별 수업 PPT"}</h3>
       <p>공개한 PPT·PPTX는 로그인 없이 원본을 다운로드할 수 있습니다.</p>
       <label className="photo-session-label">
-        수업 차시
+        {activityLabel}
         <select
           value={session}
           disabled={busy}
@@ -211,7 +214,7 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
         >
           {sessions.map(s => (
             <option key={s.number} value={s.number}>
-              {s.number}차시 · {s.title.replace(/^⦁\s*/, "")}
+              {s.label}
             </option>
           ))}
         </select>
@@ -232,7 +235,7 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
           {notice}
         </p>
       )}
-      <h4>{session}차시 공개 자료</h4>
+      <h4>{festival ? program.title : `${session}차시`} 공개 자료</h4>
       {!page.items.length && (
         <p className="photo-empty">등록된 자료가 없습니다.</p>
       )}
@@ -358,7 +361,7 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
             <form onSubmit={submit}>
               <p>
                 <b>
-                  {program.title} · {session}차시
+                  {program.title}{!festival && ` · ${session}차시`}
                 </b>
                 에 등록합니다.
               </p>
