@@ -77,6 +77,7 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
     if (!endpoint || !ready) return;
     let alive = true;
     setPage({ items: [], cursor: null, hasMore: false });
+    setPreviewId(null);
     const u = new URL(endpoint);
     u.search = new URLSearchParams({
       action: "slides",
@@ -90,7 +91,10 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
         return d as Page;
       })
       .then(p => {
-        if (alive) setPage(p);
+        if (alive) {
+          setPage(p);
+          setPreviewId(p.items[0]?.id ?? null);
+        }
       })
       .catch(e => {
         if (alive) setError(e.message);

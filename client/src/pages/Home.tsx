@@ -15,7 +15,7 @@ import { siteTitle, siteSubtitle } from "@/data/siteInfo";
 import { recordExamplesByProgram, type GradeLevel } from "@/data/recordExamples";
 
 type ModalTab = "overview" | "core" | "record" | "materials" | "photos" | "slides";
-type ProgramGroup = "창체" | "교과";
+type ProgramGroup = "전체" | "창체" | "교과";
 
 const isCreativeProgram = (program: CoreProgram) => program.track !== "교과";
 
@@ -64,14 +64,14 @@ function RecordGuide({ program, copied, activeGrade, onGradeChange, onCopy }: { 
 }
 
 export default function Home() {
-  const [activeGroup, setActiveGroup] = useState<ProgramGroup>("창체");
+  const [activeGroup, setActiveGroup] = useState<ProgramGroup>("전체");
   const [activeProgram, setActiveProgram] = useState<CoreProgram | null>(null);
   const [modalTab, setModalTab] = useState<ModalTab>("core");
   const [activeStep, setActiveStep] = useState<"C" | "O" | "R" | "E">("C");
   const [recordGrade, setRecordGrade] = useState<GradeLevel>("1학년");
   const [copied, setCopied] = useState(false);
 
-  const displayedPrograms = useMemo(() => corePrograms.filter((program) => activeGroup === "교과" ? program.track === "교과" : program.track !== "교과"), [activeGroup]);
+  const displayedPrograms = useMemo(() => corePrograms.filter((program) => activeGroup === "전체" || (activeGroup === "교과" ? program.track === "교과" : isCreativeProgram(program))).sort((a, b) => a.sequence - b.sequence), [activeGroup]);
   const currentStep = activeProgram?.steps.find((step) => step.key === activeStep);
   const currentGuide = activeProgram ? lessonGuides[activeProgram.id] ?? {
     opening: `${activeProgram.title} 활동을 시작하기 전에 나의 경험과 질문을 짧게 기록한다.`,
@@ -122,7 +122,7 @@ export default function Home() {
         </section>
 
         <section id="lessons" className="lesson-section content-width">
-          <div className="lesson-heading"><div><p className="kicker orange">LESSON ARCHIVE</p><h2>차시별 프로그램</h2><p>창체·교과 프로그램을 선택하면 차시별 학습 내용과 지도안·학생 활동지 PDF를 확인하고 내려받을 수 있습니다.</p></div><div className="group-tabs" role="tablist" aria-label="프로그램 항로 선택"><button className={activeGroup === "창체" ? "active" : ""} onClick={() => setActiveGroup("창체")}><span>01</span><div><b>창체 프로그램</b><small>관계 · 진로 · 자기이해</small></div></button><button className={activeGroup === "교과" ? "active" : ""} onClick={() => setActiveGroup("교과")}><span>02</span><div><b>교과수업 프로그램</b><small>탐구 · 분석 · 표현</small></div></button></div></div>
+          <div className="lesson-heading"><div><p className="kicker orange">LESSON ARCHIVE</p><h2>차시별 프로그램</h2><p>창체·교과 프로그램을 선택하면 차시별 학습 내용과 지도안·학생 활동지 PDF를 확인하고 내려받을 수 있습니다.</p></div><div className="group-tabs" role="group" aria-label="프로그램 분류 선택"><button className={activeGroup === "전체" ? "active" : ""} aria-pressed={activeGroup === "전체"} onClick={() => setActiveGroup("전체")}><span>ALL</span><div><b>전체 프로그램</b><small>1–22차시 모두 보기</small></div></button><button className={activeGroup === "창체" ? "active" : ""} aria-pressed={activeGroup === "창체"} onClick={() => setActiveGroup("창체")}><span>01</span><div><b>창체 프로그램</b><small>관계 · 진로 · 자기이해</small></div></button><button className={activeGroup === "교과" ? "active" : ""} aria-pressed={activeGroup === "교과"} onClick={() => setActiveGroup("교과")}><span>02</span><div><b>교과수업 프로그램</b><small>탐구 · 분석 · 표현</small></div></button></div></div>
 
           <div className="lesson-grid">
             {displayedPrograms.map((program) => { const selFocus = lessonSelFocus[program.id]; return <button className={`lesson-card ${isCreativeProgram(program) ? "creative-card" : "subject-card"}`} onClick={() => openProgram(program)} key={program.id}><div className="lesson-card-top"><span className="lesson-number">{String(program.sequence).padStart(2, "0")}</span><TrackPill program={program} /></div><div className="lesson-card-title"><small>{program.subject}</small><b>{program.title}</b><p>{program.subtitle}</p></div><div className="lesson-sel-chip"><span>사회정서</span><b>{selFocus?.competency}</b></div><div className="card-core"><span>C</span><span>O</span><span>R</span><span>E</span></div><div className="lesson-card-bottom"><span>{program.sessions}</span><em>PDF {pdfMaterials.filter(file => file.programId === program.id).length}개</em><ChevronRight size={18} /></div></button>})}
