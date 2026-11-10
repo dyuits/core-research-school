@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import FileDropzone from "./FileDropzone";
 import type { CoreProgram } from "@/data/corePrograms";
 import { mediaSessionsFor } from "@/data/mediaSessions";
 import { isFestivalProgram } from "@/data/festivalPrograms";
@@ -37,6 +38,7 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [version, setVersion] = useState(0);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   function remember(value: string) {
     setToken(value);
     try {
@@ -140,9 +142,7 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
-    const files = data
-      .getAll("slides")
-      .filter((f): f is File => f instanceof File && f.size > 0);
+    const files = [...selectedFiles];
     void run(async () => {
       if (!ready) throw new Error("파일 저장소 연결이 필요합니다.");
       if (!files.length) throw new Error("PPT·PPTX 파일을 선택하세요.");
@@ -184,10 +184,14 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
             },
             body: JSON.stringify(meta),
           });
+          setSelectedFiles(previous =>
+            previous.filter(selected => selected !== file)
+          );
           completed++;
           setNotice(`${completed}/${files.length}개 공개 완료`);
         }
         form.reset();
+        setSelectedFiles([]);
         setNotice(
           `${completed}개 자료를 공개했습니다. 다른 선생님도 원본을 다운로드할 수 있습니다.`
         );
@@ -361,7 +365,8 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
             <form onSubmit={submit}>
               <p>
                 <b>
-                  {program.title}{!festival && ` · ${session}차시`}
+                  {program.title}
+                  {!festival && ` · ${session}차시`}
                 </b>
                 에 등록합니다.
               </p>
@@ -369,16 +374,12 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
                 자료 설명
                 <input name="caption" maxLength={500} />
               </label>
-              <label>
-                수업 PPT 파일 (여러 개 선택 가능)
-                <input
-                  type="file"
-                  name="slides"
-                  multiple
-                  required
-                  accept=".ppt,.pptx"
-                />
-              </label>
+              <FileDropzone
+                kind="slides"
+                files={selectedFiles}
+                onChange={setSelectedFiles}
+                disabled={busy}
+              />
               <p>
                 PPT·PPTX, 파일당 50MB 이하. 매크로 자료는 지원하지 않습니다.
                 원본 파일 그대로 공개됩니다.
@@ -388,8 +389,10 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
                 학생 식별 정보를 제거했고, 자료 공개에 필요한 저작권·동의를
                 확인했습니다.
               </label>
-              <button disabled={busy || !ready}>
-                {busy ? "업로드 및 파일 검증 중…" : "PPT 등록 및 공개"}
+              <button disabled={busy || !ready || !selectedFiles.length}>
+                {busy
+                  ? "업로드 및 파일 검증 중…"
+                  : `PPT ${selectedFiles.length}개 등록 및 공개`}
               </button>
             </form>
           </>

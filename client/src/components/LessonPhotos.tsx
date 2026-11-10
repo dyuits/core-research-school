@@ -196,9 +196,7 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    const picked = data
-      .getAll("photos")
-      .filter((f): f is File => f instanceof File && f.size > 0);
+    const picked = [...selectedFiles];
     const caption = String(data.get("caption") || "");
     const privacyConfirmed = data.get("privacy") === "on";
     void run(async () => {
@@ -234,6 +232,9 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
             publishedPhoto,
             ...previous.filter(photo => photo.id !== publishedPhoto.id),
           ]);
+          setSelectedFiles(previous =>
+            previous.filter(selected => selected !== file)
+          );
           uploaded++;
           setNotice(`${uploaded}/${picked.length}장 등록 완료`);
         }
@@ -431,8 +432,14 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
                 학생 얼굴·성명·학번·명찰·활동지의 식별 정보가 드러나지 않도록
                 처리했고, 사진 공개에 필요한 동의·초상권을 확인했습니다.
               </label>
-              <button disabled={busy || !endpoint || !storageReady}>
-                {busy ? "사진 등록 중…" : "사진 등록 및 공개"}
+              <button
+                disabled={
+                  busy || !endpoint || !storageReady || !selectedFiles.length
+                }
+              >
+                {busy
+                  ? "사진 등록 중…"
+                  : `사진 ${selectedFiles.length}장 등록 및 공개`}
               </button>
             </form>
           </>
