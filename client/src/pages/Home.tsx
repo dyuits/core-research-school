@@ -106,7 +106,7 @@ export default function Home() {
 
       <main id="top">
         <section className="compact-hero">
-          <div className="hero-materials" aria-hidden="true"><i /><i /><span>JEJU COAST / FIELD NOTES</span></div>
+          <div className="hero-materials" aria-hidden="true"><i /><i /><span>JEJU SKY / LEARNING NOTES</span></div>
           <div className="hero-inner">
             <p className="kicker">JEJU JUNGANG HIGH SCHOOL · 2026–2027</p>
             <h1 className="report-site-title">AI·디지털 활용「CORE」프로그램을 통한<br /><em>질문수용 중심 수업 실천과<br />AI 리터러시 함양</em></h1>

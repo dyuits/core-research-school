@@ -1,0 +1,522 @@
+/* Sky: clear blue, cloud-white surfaces, and readable deep-blue type. */
+:root {
+  --background: #f3faff;
+  --foreground: #173d59;
+  --primary: #0369a1;
+  --primary-foreground: #fff;
+  --border: #c9e5f5;
+  --ring: #087ab8;
+  --navy: #173d59;
+  --ink: #173d59;
+  --paper: #f3faff;
+  --soft: #e6f4ff;
+  --line: #c9e5f5;
+  --slate: #496b83;
+  --amber: #087ab8;
+  --card-accent: #0877b4;
+  --card-tint: #e5f5ff;
+}
+html,
+body,
+.archive-page {
+  background: var(--paper);
+  color: var(--ink);
+}
+::selection {
+  background: #bae6fd;
+  color: #123d59;
+}
+.simple-header {
+  background: #f8fcffed;
+  border-color: var(--line);
+}
+.simple-brand strong,
+.simple-brand small,
+.simple-header nav a {
+  color: #245574;
+}
+.simple-header nav a:hover {
+  color: #0369a1;
+}
+.archive-page::before {
+  border-color: #aad6ef;
+}
+.compact-hero {
+  background: linear-gradient(120deg, #e6f5ff 0%, #d5efff 52%, #bde5fc 100%);
+  color: var(--navy);
+  border-bottom: 1px solid #b8dff3;
+}
+.compact-hero h1 {
+  color: #173d59;
+}
+.compact-hero h1 em {
+  color: #075f98;
+}
+.compact-hero .hero-inner > p:not(.kicker) {
+  color: #355f7d;
+}
+.kicker,
+.kicker.orange {
+  color: #086a9f;
+}
+.hero-materials {
+  opacity: 0.8;
+  pointer-events: none;
+}
+.hero-materials::before,
+.hero-materials::after {
+  border: 0;
+  border-radius: 0;
+  transform: none;
+  background:
+    radial-gradient(
+      ellipse 23% 48% at 30% 59%,
+      #ffffffc9 98%,
+      transparent 100%
+    ),
+    radial-gradient(
+      ellipse 27% 63% at 51% 43%,
+      #ffffffc9 98%,
+      transparent 100%
+    ),
+    radial-gradient(ellipse 24% 47% at 71% 59%, #ffffffc9 98%, transparent 100%);
+}
+.hero-materials::before {
+  width: 430px;
+  height: 150px;
+  top: 45px;
+  right: -60px;
+}
+.hero-materials::after {
+  width: 320px;
+  height: 110px;
+  top: 280px;
+  right: 5%;
+  opacity: 0.7;
+}
+.hero-materials i {
+  border-color: #81c5ee;
+}
+.hero-materials span {
+  color: #326c91;
+}
+.hero-link {
+  color: #075f98;
+  border-color: #087ab8;
+}
+.hero-link:hover {
+  color: #154866;
+}
+.hero-core-meaning {
+  border-color: #a8d4ed;
+  background: #ffffffd9;
+  box-shadow: 0 6px 20px #4c9ed00a;
+}
+.hero-core-meaning-title span,
+.hero-core-meaning-title b {
+  color: #075f98;
+}
+.hero-core-meaning > p {
+  color: #355f7d !important;
+}
+.hero-core-meaning > p strong {
+  color: #075f98;
+}
+.hero-core-steps > div {
+  border-color: #c0e2f7;
+  background: #edf8ff;
+}
+.hero-core-steps > div:nth-child(n) b {
+  background: #0877b4;
+  color: #fff;
+}
+.hero-core-steps > div:nth-child(2) b {
+  background: #136ab5;
+}
+.hero-core-steps > div:nth-child(3) b {
+  background: #146d96;
+}
+.hero-core-steps > div:nth-child(4) b {
+  background: #075f98;
+}
+.hero-core-steps span,
+.hero-core-steps em {
+  color: #295d7d;
+}
+.core-summary h2,
+.lesson-heading h2,
+.record-guide-inner h2 {
+  color: var(--navy);
+}
+.core-summary::before,
+.lesson-section::before,
+.record-guide-band::before {
+  color: #087ab8;
+  border-color: #b5ddf3;
+  background: #f3faff;
+}
+.lesson-heading {
+  border-color: #9bcdec;
+}
+.lesson-heading > div:first-child > p:not(.kicker) {
+  color: #496b83;
+}
+.group-tabs button {
+  background: #fff;
+  color: #245b7d;
+  border-color: #b7ddef;
+  box-shadow:
+    0 3px 0 #d2eafb,
+    0 7px 15px #4c9ed00a;
+}
+.group-tabs button:hover {
+  background: #e8f6ff;
+  color: #075f98;
+  border-color: #65b5e5;
+}
+.group-tabs button.active {
+  background: linear-gradient(120deg, #086da8, #087bb9);
+  color: #fff;
+  border-color: #086da8;
+  box-shadow:
+    0 3px 0 #085a88,
+    0 7px 16px #278fc51c;
+}
+.group-tabs button.active > span {
+  border-color: #c2ecff;
+  color: #fff;
+}
+.lesson-card:nth-child(n) {
+  --card-accent: #0877b4;
+  --card-tint: #e5f5ff;
+  background: #fff;
+  color: var(--card-accent);
+  border-color: #c9e5f5;
+  border-top-color: #75c7ef;
+}
+.lesson-card:nth-child(even) {
+  --card-accent: #1768ac;
+  --card-tint: #eaf3ff;
+  border-top-color: #82bced;
+}
+.lesson-card:nth-child(3n) {
+  --card-accent: #0d7099;
+  --card-tint: #e6f8ff;
+  border-top-color: #7ad2ef;
+}
+.lesson-card:hover {
+  background: #fbfeff;
+  border-color: #6abbea;
+  box-shadow: 0 8px 24px #278fc512;
+}
+.lesson-card-title b {
+  color: #173d59;
+}
+.lesson-card-title small {
+  color: var(--card-accent);
+}
+.lesson-card-title p {
+  color: #496b83;
+}
+.lesson-card-bottom {
+  border-color: #d4eaf7;
+}
+.lesson-card-bottom > span,
+.lesson-card-bottom svg {
+  color: #096da5;
+}
+.lesson-card-bottom em {
+  color: #496b83;
+}
+.track-pill.creative,
+.track-pill.subject,
+.track-pill {
+  color: #096da5;
+  border-color: #b1d9f0;
+  background: #e5f5ff;
+}
+.card-core span {
+  color: var(--card-accent);
+  border-color: #a6d4ee;
+  background: var(--card-tint);
+}
+.lesson-card:nth-child(n) .lesson-sel-chip b {
+  background: #e7f5ff;
+  color: #075f98;
+}
+.lesson-sel-chip span {
+  color: #496b83;
+}
+.record-guide-band {
+  background: linear-gradient(115deg, #e2f3ff, #eff9ff);
+  border-color: #c9e5f5;
+}
+.record-guide-band::before {
+  background: #eaf7ff;
+}
+.record-guide-inner h2 em,
+.record-guide-inner > p b {
+  color: #096da5;
+}
+.record-guide-inner > p {
+  color: #496b83;
+}
+.simple-footer {
+  background: linear-gradient(120deg, #0a6096, #087bb4);
+}
+.simple-footer .simple-brand strong,
+.simple-footer .simple-brand small,
+.simple-footer p {
+  color: #fff;
+}
+.lesson-dialog {
+  background: #f7fcff;
+  border-color: #c0def2;
+  box-shadow: 0 24px 75px #17476530;
+}
+.dialog-topbar {
+  background: #f4faff;
+  border-color: #c9e5f5;
+}
+.dialog-topbar > div > span {
+  color: #496b83;
+}
+.dialog-heading {
+  background: linear-gradient(120deg, #e5f5ff, #f5fbff);
+}
+.dialog-heading h2 {
+  color: #173d59;
+}
+.dialog-heading small,
+.dialog-heading p {
+  color: #496b83;
+}
+.dialog-close {
+  background: #dff1fc;
+  color: #096da5;
+}
+.dialog-close:hover {
+  background: #bfe5fb;
+  color: #174765;
+}
+.dialog-tabs {
+  background: #f9fdff;
+  border-color: #c9e5f5;
+}
+.dialog-tabs button {
+  color: #496b83;
+}
+.dialog-tabs button.active {
+  color: #075f98;
+  background: #e6f5ff;
+}
+.dialog-tabs button.active::after {
+  background: #1699da;
+}
+.overview-goal,
+.overview-output,
+.teacher-question,
+.sel-evidence,
+.step-detail,
+.record-example-box,
+.activity-meta > div,
+.guide-item,
+.assessment-block p {
+  border-color: #c9e5f5;
+  background: #edf8ff;
+}
+.overview-goal svg,
+.teacher-question svg,
+.core-summary-steps strong,
+.step-detail > span {
+  color: #0877b4;
+}
+.overview-top-grid span,
+.teacher-question span,
+.guide-item p,
+.step-detail p,
+.activity-meta p,
+.assessment-block p,
+.record-notice {
+  color: #496b83;
+}
+.teacher-question p,
+.guide-item b,
+.step-detail b,
+.activity-meta span,
+.overview-section-title b,
+.record-area-label {
+  color: #245574;
+}
+.core-step-tabs button {
+  border-color: #b7ddef;
+  background: #fff;
+  color: #245b7d;
+}
+.core-step-tabs button.active,
+.core-step-tabs button:hover {
+  background: #0873ae;
+  border-color: #0873ae;
+  color: #fff;
+}
+.overview-activity-flow article {
+  border-color: #d2e8f6;
+}
+.overview-activity-flow strong,
+.assessment-block p span {
+  color: #0877b4;
+  background: #e2f3ff;
+}
+.overview-activity-flow b,
+.overview-activity-flow p {
+  color: #355f7d;
+}
+.record-example-box {
+  border-left-color: #42abe1;
+  background: #fff;
+}
+.record-example-box > p,
+.record-example-heading span {
+  color: #245574;
+}
+.record-example-heading button {
+  color: #096da5;
+}
+.grade-record-picker {
+  border-color: #c3e2f5;
+  background: linear-gradient(120deg, #e6f5ff, #f7fcff);
+}
+.grade-record-picker-heading span,
+.grade-record-picker-heading b {
+  color: #245b7d;
+}
+.grade-record-type {
+  background: #dff2ff;
+  color: #075f98 !important;
+}
+.grade-record-tabs button {
+  border-color: #b7ddef;
+  background: #fff;
+  color: #245b7d;
+}
+.grade-record-tabs button.active,
+.grade-record-tabs button:hover {
+  background: #0873ae;
+  border-color: #0873ae;
+  color: #fff;
+}
+.record-competencies {
+  background: #e7f5ff;
+  color: #355f7d !important;
+}
+.record-competencies b,
+.record-competencies span {
+  color: #355f7d;
+}
+.program-materials,
+.lesson-photos {
+  color: #173d59;
+}
+.materials-notice,
+.photo-empty,
+.photo-notice {
+  background: #e5f5ff;
+  color: #355f7d;
+}
+.pdf-file-list article,
+.source-session-list details,
+.photo-gallery figure {
+  background: #fff;
+  border-color: #c9e5f5;
+}
+.pdf-file-list small,
+.program-materials .materials-source,
+.program-materials .pdf-preview-help {
+  color: #496b83;
+}
+.pdf-file-list a,
+.photo-admin form > button {
+  background: #0369a1;
+  color: #fff;
+  border-color: #0369a1;
+}
+.pdf-file-list a:hover,
+.photo-admin form > button:hover {
+  background: #075985;
+}
+.pdf-file-actions button {
+  border-color: #81bfe5;
+  color: #075f98;
+  background: #fff;
+}
+.pdf-file-actions button[aria-pressed="true"] {
+  background: #e1f3ff;
+}
+.pdf-preview {
+  background: #fff;
+  border-color: #c9e5f5;
+}
+.pdf-preview-heading a {
+  color: #096da5;
+}
+.pdf-reader-toolbar {
+  border-color: #c9e5f5;
+  background: #eaf7ff;
+}
+.pdf-reader-toolbar button {
+  border-color: #9bcae7;
+  background: #fff;
+  color: #075f98;
+}
+.pdf-reader-toolbar button[aria-pressed="true"] {
+  background: #d7efff;
+}
+.pdf-reader-pages {
+  background: #deedf7;
+}
+.photo-admin {
+  border-color: #c9e5f5;
+  background: #eef8ff;
+}
+.lesson-photos select,
+.lesson-photos input {
+  border-color: #a8d2eb;
+  color: #245574;
+  background: #fff;
+}
+.lesson-photos button {
+  border-color: #9bcae7;
+  color: #075f98;
+  background: #e5f5ff;
+}
+.photo-gallery figcaption small {
+  color: #496b83;
+}
+/* Keep warning/error colors semantic rather than making them look informational. */
+.pdf-file-list a:focus-visible,
+.pdf-file-actions button:focus-visible,
+.pdf-preview-heading a:focus-visible,
+.source-session-list summary:focus-visible,
+.pdf-reader-toolbar button:focus-visible,
+.pdf-reader-pages:focus-visible,
+.lesson-photos :focus-visible {
+  outline-color: #087ab8;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .lesson-card,
+  .group-tabs button {
+    transition: none;
+    animation: none;
+  }
+}
+.compact-hero::before {
+  background: radial-gradient(circle at 40% 40%, #fff 0 8%, #eaf8ff 9% 22%, #c5eaff80 23% 55%, transparent 70%);
+  opacity: .8;
+  animation: none;
+}
+.compact-hero::after { border-color: #8fcff1 transparent transparent #8fcff1; }
+.compact-hero .kicker { color: #356c92; }
+.lesson-card::before { color: #496b83; opacity: 1; }
