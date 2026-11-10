@@ -15,6 +15,7 @@ type Page = { items: Slide[]; cursor: string | null; hasMore: boolean };
 export default function LessonSlides({ program }: { program: CoreProgram }) {
   const sessions = reportSessions.filter(s => s.programId === program.id);
   const [session, setSession] = useState(sessions[0]?.number ?? 1);
+  const [previewId, setPreviewId] = useState<string | null>(null);
   const [endpoint, setEndpoint] = useState("");
   const [ready, setReady] = useState(false);
   const [token, setToken] = useState(() => {
@@ -199,6 +200,7 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
           disabled={busy}
           onChange={e => {
             setSession(Number(e.target.value));
+            setPreviewId(null);
             setError("");
             setNotice("");
           }}
@@ -241,6 +243,16 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
                 {new Date(s.createdAt).toLocaleDateString("ko-KR")}
               </small>
             </div>
+            <button
+              type="button"
+              aria-expanded={previewId === s.id}
+              aria-controls={`slide-preview-${s.id}`}
+              onClick={() =>
+                setPreviewId(previous => (previous === s.id ? null : s.id))
+              }
+            >
+              {previewId === s.id ? "미리보기 닫기" : "PPT 미리보기"}
+            </button>
             <a className="slide-download" href={s.downloadUrl}>
               원본 다운로드
             </a>
@@ -261,6 +273,36 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
               >
                 공개 취소
               </button>
+            )}
+            {previewId === s.id && (
+              <section
+                className="slide-preview"
+                id={`slide-preview-${s.id}`}
+                aria-label={`${s.name} 미리보기`}
+              >
+                <p>
+                  Microsoft 웹 뷰어로 공개 자료를 표시합니다. 아래 화면에서
+                  슬라이드를 넘기거나 전체 화면으로 볼 수 있습니다.
+                </p>
+                <iframe
+                  title={`${s.name} 슬라이드 미리보기`}
+                  src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(s.downloadUrl)}`}
+                  allowFullScreen
+                  referrerPolicy="no-referrer"
+                />
+                <p>
+                  미리보기가 표시되지 않으면{" "}
+                  <a
+                    href={`https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(s.downloadUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    새 창에서 미리보기
+                  </a>{" "}
+                  또는 원본 다운로드를 이용하세요. 글꼴·애니메이션은 원본과 다를
+                  수 있습니다.
+                </p>
+              </section>
             )}
           </li>
         ))}

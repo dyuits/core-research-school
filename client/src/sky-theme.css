@@ -525,3 +525,8 @@ body,
 .slide-list li { display:flex; align-items:center; flex-wrap:wrap; gap:14px; padding:18px; border:1px solid #bae6fd; background:#f0f9ff; border-radius:14px; }
 .slide-list li > div { flex:1; min-width:160px; overflow-wrap:anywhere; }
 .slide-download { color:#0369a1; font-weight:700; text-decoration:underline; padding:10px; }
+.slide-preview { flex-basis:100%; min-width:0; }
+.slide-preview iframe { display:block; width:100%; height:min(65vh,640px); min-height:280px; border:1px solid #bae6fd; border-radius:12px; background:#fff; }
+.slide-preview p { font-size:13px; line-height:1.6; margin:10px 0; color:#475569; }
+.slide-preview a { color:#0369a1; text-decoration:underline; }
+@media(max-width:600px) { .slide-preview iframe { height:55vh; min-height:300px; } }
