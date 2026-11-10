@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import FileDropzone from "./FileDropzone";
 
 type Preview = { name: string; url: string };
 export default function PhotoUploadField({
@@ -24,20 +25,12 @@ export default function PhotoUploadField({
   }, [files]);
   return (
     <>
-      <label>
-        활동 사진 (여러 장 선택 가능)
-        <input
-          type="file"
-          name="photos"
-          multiple
-          required
-          accept="image/jpeg,image/png,image/webp"
-          disabled={disabled}
-          onChange={event =>
-            onChange(Array.from(event.currentTarget.files ?? []))
-          }
-        />
-      </label>
+      <FileDropzone
+        kind="photos"
+        files={files}
+        onChange={onChange}
+        disabled={disabled}
+      />
       {!!files.length && (
         <section
           className="photo-selection-preview"
