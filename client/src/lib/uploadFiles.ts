@@ -2,8 +2,17 @@ export type UploadKind = "photos" | "slides";
 export function uploadFileError(file: File, kind: UploadKind): string | null {
   if (!file.size) return "빈 파일은 등록할 수 없습니다.";
   if (kind === "photos") {
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type))
-      return "JPG·PNG·WebP 사진을 선택하세요.";
+    if (
+      ![
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/heic",
+        "image/heif",
+      ].includes(file.type) &&
+      !/\.(jpe?g|png|webp|heic|heif)$/i.test(file.name)
+    )
+      return "JPG·PNG·WebP·HEIC·HEIF 사진을 선택하세요.";
     if (file.size > 20 * 1024 * 1024)
       return "사진은 파일당 20MB 이하로 선택하세요.";
   } else {

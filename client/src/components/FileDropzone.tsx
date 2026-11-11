@@ -70,7 +70,7 @@ export default function FileDropzone({
         </h4>
         <p id={helpId}>
           {photos
-            ? "JPG·PNG·WebP · 파일당 20MB 이하"
+            ? "JPG·PNG·WebP·HEIC·HEIF · 파일당 20MB 이하"
             : "PPT·PPTX·PDF · 파일당 50MB 이하"}
           <br />
           여러 번 추가할 수 있으며, 같은 파일은 한 번만 포함됩니다.
@@ -88,7 +88,9 @@ export default function FileDropzone({
           type="file"
           multiple
           accept={
-            photos ? "image/jpeg,image/png,image/webp" : ".ppt,.pptx,.pdf"
+            photos
+              ? "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp,.heic,.heif"
+              : ".ppt,.pptx,.pdf"
           }
           disabled={disabled}
           aria-label={`${title} 파일 선택`}

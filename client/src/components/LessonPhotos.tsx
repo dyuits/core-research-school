@@ -1,3 +1,5 @@
+import { photoSource } from "@/lib/photoSource";
+import { uploadFileError } from "@/lib/uploadFiles";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   Dialog,
@@ -27,13 +29,15 @@ function storedToken() {
   }
 }
 async function preparePhoto(file: File): Promise<string> {
-  if (
-    !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
-    file.size > 20 * 1024 * 1024
-  )
-    throw new Error("JPG·PNG·WebP 사진(원본 20MB 이하)을 선택하세요.");
-  const bitmap = await createImageBitmap(file, {
+  const error = uploadFileError(file, "photos");
+  if (error) throw new Error(`${file.name} · ${error}`);
+  const source = await photoSource(file);
+  const bitmap = await createImageBitmap(source, {
     imageOrientation: "from-image",
+  }).catch(() => {
+    throw new Error(
+      `${file.name} 사진을 읽지 못했습니다. JPG 또는 PNG로 내보낸 뒤 다시 선택하세요.`
+    );
   });
   try {
     const scale = Math.min(1, 2048 / Math.max(bitmap.width, bitmap.height));
@@ -424,8 +428,8 @@ export default function LessonPhotos({ program }: { program: CoreProgram }) {
                 disabled={busy}
               />
               <p>
-                JPG·PNG·WebP, 원본 파일당 20MB 이하. 공개용 사진은 자동으로
-                크기를 조정하고 위치정보 등 메타데이터를 제거합니다.
+                JPG·PNG·WebP·HEIC·HEIF, 원본 파일당 20MB 이하. 공개용 사진은
+                자동으로 크기를 조정하고 위치정보 등 메타데이터를 제거합니다.
               </p>
               <label className="photo-privacy">
                 <input type="checkbox" name="privacy" required />
