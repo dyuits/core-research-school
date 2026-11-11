@@ -34,10 +34,11 @@ test("혼합 드롭에서는 유효한 사진을 유지하고 지원하지 않�
   assert.deepEqual(files, [good]);
   assert.equal(rejected.length, 2);
 });
-test("PPT·PPTX 여러 파일을 함께 선택할 수 있고 사진을 PPT로 등록하지 않는다", () => {
+test("PPT·PPTX·PDF 여러 파일을 함께 선택할 수 있고 사진을 PPT로 등록하지 않는다", () => {
   const slides = [
     new File(["slide"], "자료.PPTX"),
     new File(["slide"], "자료.ppt"),
+    new File(["pdf"], "자료.PDF"),
   ];
   const { files, rejected } = appendUploadFiles(
     [],

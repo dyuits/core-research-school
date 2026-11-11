@@ -4,6 +4,11 @@ import AdmZip from "adm-zip";
 import CFB from "cfb";
 import { isAdmin } from "./auth.mjs";
 export const MAX_SLIDE = 50 * 1024 * 1024;
+const mimeTypes = {
+  ppt: "application/vnd.ms-powerpoint",
+  pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  pdf: "application/pdf",
+};
 const uuid =
   /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
 export function validateSlide(bytes, ext) {
@@ -49,7 +54,13 @@ export function validateSlide(bytes, ext) {
       file.FullPaths.some(p => /VBA|Macros/i.test(p))
     )
       throw new Error("PPT 형식을 확인하거나 매크로를 제거하세요.");
-  } else throw new Error("PPT·PPTX만 지원합니다.");
+  } else if (ext === "pdf") {
+    if (
+      !/^%PDF-[12]\.\d/.test(bytes.subarray(0, 8).toString("ascii")) ||
+      !/%%EOF\s*$/.test(bytes.subarray(-1024).toString("latin1"))
+    )
+      throw new Error("PDF 파일 형식을 확인하세요.");
+  } else throw new Error("PPT·PPTX·PDF만 지원합니다.");
 }
 export async function slideRequest({
   request,
@@ -69,7 +80,7 @@ export async function slideRequest({
   };
   function scope(body) {
     const loc = lesson(body.programId, body.session);
-    if (!uuid.test(body.id ?? "") || !["ppt", "pptx"].includes(body.ext))
+    if (!uuid.test(body.id ?? "") || !Object.hasOwn(mimeTypes, body.ext))
       throw new HttpError(400, "자료 식별자·형식이 올바르지 않습니다.");
     return {
       ...loc,
@@ -100,12 +111,15 @@ export async function slideRequest({
             addRandomSuffix: false,
             allowOverwrite: false,
             validUntil: Date.now() + 15 * 60 * 1000,
-            allowedContentTypes: [
-              "application/vnd.ms-powerpoint",
-              "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-              "application/octet-stream",
-              "application/zip",
-            ],
+            allowedContentTypes:
+              loc.ext === "pdf"
+                ? [mimeTypes.pdf]
+                : [
+                    mimeTypes.ppt,
+                    mimeTypes.pptx,
+                    "application/octet-stream",
+                    "application/zip",
+                  ],
           };
         },
       })
@@ -188,11 +202,8 @@ export async function slideRequest({
     return new Response(stream, {
       headers: {
         ...cors,
-        "Content-Type":
-          meta.ext === "ppt"
-            ? "application/vnd.ms-powerpoint"
-            : "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-        "Content-Disposition": `attachment; filename="lesson.${meta.ext}"; filename*=UTF-8''${encodeURIComponent(meta.name)}`,
+        "Content-Type": mimeTypes[meta.ext],
+        "Content-Disposition": `${meta.ext === "pdf" && url.searchParams.get("preview") === "1" ? "inline" : "attachment"}; filename="lesson.${meta.ext}"; filename*=UTF-8''${encodeURIComponent(meta.name)}`,
         "Content-Length": String(meta.size),
         "X-File-SHA256": meta.sha256,
       },

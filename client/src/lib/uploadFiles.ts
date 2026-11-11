@@ -7,9 +7,10 @@ export function uploadFileError(file: File, kind: UploadKind): string | null {
     if (file.size > 20 * 1024 * 1024)
       return "사진은 파일당 20MB 이하로 선택하세요.";
   } else {
-    if (!/\.(ppt|pptx)$/i.test(file.name)) return "PPT·PPTX 파일을 선택하세요.";
+    if (!/\.(ppt|pptx|pdf)$/i.test(file.name))
+      return "PPT·PPTX·PDF 파일을 선택하세요.";
     if (file.size > 50 * 1024 * 1024)
-      return "PPT는 파일당 50MB 이하로 선택하세요.";
+      return "수업 자료는 파일당 50MB 이하로 선택하세요.";
   }
   return null;
 }

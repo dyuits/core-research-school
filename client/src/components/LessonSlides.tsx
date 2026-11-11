@@ -1,8 +1,9 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { lazy, Suspense, useEffect, useState, type FormEvent } from "react";
 import FileDropzone from "./FileDropzone";
 import type { CoreProgram } from "@/data/corePrograms";
 import { mediaSessionsFor } from "@/data/mediaSessions";
 import { isFestivalProgram } from "@/data/festivalPrograms";
+const PdfPreview = lazy(() => import("./PdfPreview"));
 const tokenKey = "core-photo-admin-session";
 type Slide = {
   id: string;
@@ -145,10 +146,13 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
     const files = [...selectedFiles];
     void run(async () => {
       if (!ready) throw new Error("파일 저장소 연결이 필요합니다.");
-      if (!files.length) throw new Error("PPT·PPTX 파일을 선택하세요.");
+      if (!files.length) throw new Error("PPT·PPTX·PDF 파일을 선택하세요.");
       for (const file of files) {
-        if (!/\.(ppt|pptx)$/i.test(file.name) || file.size > 50 * 1024 * 1024)
-          throw new Error("파일당 50MB 이하의 PPT·PPTX를 선택하세요.");
+        if (
+          !/\.(ppt|pptx|pdf)$/i.test(file.name) ||
+          file.size > 50 * 1024 * 1024
+        )
+          throw new Error("파일당 50MB 이하의 PPT·PPTX·PDF를 선택하세요.");
       }
       const { upload } = await import("@vercel/blob/client");
       let completed = 0;
@@ -171,9 +175,11 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
             headers: { Authorization: `Bearer ${token}` },
             clientPayload: JSON.stringify(meta),
             contentType:
-              ext === "ppt"
-                ? "application/vnd.ms-powerpoint"
-                : "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+              ext === "pdf"
+                ? "application/pdf"
+                : ext === "ppt"
+                  ? "application/vnd.ms-powerpoint"
+                  : "application/vnd.openxmlformats-officedocument.presentationml.presentation",
             multipart: true,
           });
           await request(`${endpoint}?action=slide-finalize`, {
@@ -203,7 +209,7 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
   return (
     <section className="lesson-photos" aria-label="차시별 수업 PPT">
       <h3>{festival ? "축제 활동 PPT" : "차시별 수업 PPT"}</h3>
-      <p>공개한 PPT·PPTX는 로그인 없이 원본을 다운로드할 수 있습니다.</p>
+      <p>공개한 PPT·PPTX·PDF는 로그인 없이 원본을 다운로드할 수 있습니다.</p>
       <label className="photo-session-label">
         {activityLabel}
         <select
@@ -262,7 +268,11 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
                 setPreviewId(previous => (previous === s.id ? null : s.id))
               }
             >
-              {previewId === s.id ? "미리보기 닫기" : "PPT 미리보기"}
+              {previewId === s.id
+                ? "미리보기 닫기"
+                : s.ext === "pdf"
+                  ? "PDF 미리보기"
+                  : "PPT 미리보기"}
             </button>
             <a className="slide-download" href={s.downloadUrl}>
               원본 다운로드
@@ -291,28 +301,51 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
                 id={`slide-preview-${s.id}`}
                 aria-label={`${s.name} 미리보기`}
               >
-                <p>
-                  Microsoft 웹 뷰어로 공개 자료를 표시합니다. 아래 화면에서
-                  슬라이드를 넘기거나 전체 화면으로 볼 수 있습니다.
-                </p>
-                <iframe
-                  title={`${s.name} 슬라이드 미리보기`}
-                  src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(s.downloadUrl)}`}
-                  allowFullScreen
-                  referrerPolicy="no-referrer"
-                />
-                <p>
-                  미리보기가 표시되지 않으면{" "}
-                  <a
-                    href={`https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(s.downloadUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    새 창에서 미리보기
-                  </a>{" "}
-                  또는 원본 다운로드를 이용하세요. 글꼴·애니메이션은 원본과 다를
-                  수 있습니다.
-                </p>
+                {s.ext === "pdf" ? (
+                  <>
+                    <Suspense
+                      fallback={<p role="status">PDF를 불러오는 중입니다.</p>}
+                    >
+                      <PdfPreview
+                        key={s.id}
+                        url={s.downloadUrl}
+                        title={s.name}
+                      />
+                    </Suspense>
+                    <a
+                      href={s.downloadUrl + "&preview=1"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      새 탭에서 보기
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      Microsoft 웹 뷰어로 공개 자료를 표시합니다. 아래 화면에서
+                      슬라이드를 넘기거나 전체 화면으로 볼 수 있습니다.
+                    </p>
+                    <iframe
+                      title={`${s.name} 슬라이드 미리보기`}
+                      src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(s.downloadUrl)}`}
+                      allowFullScreen
+                      referrerPolicy="no-referrer"
+                    />
+                    <p>
+                      미리보기가 표시되지 않으면{" "}
+                      <a
+                        href={`https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(s.downloadUrl)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        새 창에서 미리보기
+                      </a>{" "}
+                      또는 원본 다운로드를 이용하세요. 글꼴·애니메이션은 원본과
+                      다를 수 있습니다.
+                    </p>
+                  </>
+                )}
               </section>
             )}
           </li>
@@ -342,7 +375,7 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
         </button>
       )}
       <details className="photo-admin">
-        <summary>관리자 로그인 · PPT 등록</summary>
+        <summary>관리자 로그인 · 자료 등록</summary>
         {!token ? (
           <form onSubmit={login}>
             <label>
@@ -381,7 +414,7 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
                 disabled={busy}
               />
               <p>
-                PPT·PPTX, 파일당 50MB 이하. 매크로 자료는 지원하지 않습니다.
+                PPT·PPTX·PDF, 파일당 50MB 이하. 매크로 자료는 지원하지 않습니다.
                 원본 파일 그대로 공개됩니다.
               </p>
               <label className="photo-privacy">
@@ -392,7 +425,7 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
               <button disabled={busy || !ready || !selectedFiles.length}>
                 {busy
                   ? "업로드 및 파일 검증 중…"
-                  : `PPT ${selectedFiles.length}개 등록 및 공개`}
+                  : `자료 ${selectedFiles.length}개 등록 및 공개`}
               </button>
             </form>
           </>
