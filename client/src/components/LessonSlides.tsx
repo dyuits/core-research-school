@@ -1,3 +1,4 @@
+import { upload } from "@vercel/blob/client";
 import { lazy, Suspense, useEffect, useState, type FormEvent } from "react";
 import FileDropzone from "./FileDropzone";
 import type { CoreProgram } from "@/data/corePrograms";
@@ -154,7 +155,6 @@ export default function LessonSlides({ program }: { program: CoreProgram }) {
         )
           throw new Error("파일당 50MB 이하의 PPT·PPTX·PDF를 선택하세요.");
       }
-      const { upload } = await import("@vercel/blob/client");
       let completed = 0;
       try {
         for (const file of files) {
